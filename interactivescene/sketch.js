@@ -1,33 +1,27 @@
-// Project Title
+// interactive scene
 // Your Name
 // Date
 //
 // Extra for Experts:
 // - describe what you did to take this project "above and beyond"
-let x;
-let dx;
-let rectWidth;
-
 
 function setup() {
-  createCanvas(windowWidth, windowHeight);
-  x = width/2;
-  dx = 5;
-  rectWidth= 200;
+    createCanvas(400, 400);
+    background(255); 	
 }
 
+
 function draw() {
-  background(0,100,100);
-  //move rect
-  x += dx;
+  let size = 50
 
-  //check if hit the wall
-  if (x > width - rectWidth || x<0){
-    dx = dx * -1
-  }
+  if(mouseIsPressed && keyIsDown(82)){
+    rect(mouseX, mouseY,size , size);}
+  if(mouseIsPressed && keyIsDown(69)){
+    ellipse(mouseX, mouseY, size, size);}
 
-  //display ract
-  fill(0,255,0);
-  rect(x,400,rectWidth,150);
+  if(keyIsDown(87)){
+    background(255);}
+  if(keyIsDown(66)){
+    background(0);}
 
 }
