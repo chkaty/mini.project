@@ -7,13 +7,13 @@ let restart = 0;
 let hap =0;
 let timer = 60;
 let score = 0;
-let squ = ["a","b","c","d","e","f","a1","b1","c1","d1","e1","f1","a2","b2","c2","d2","e2","f2","a3","b3","c3","d3","e3","f3","a4","b4","c4","d4","e4","f4"];
+let volume = 0.5;
 let coordinateX = [];
 let coordinateY = [];
 let red, green, blue;
 let aors;
 let r,g,b;
-let crgb;
+let changeRGB;
 let nr,ng,nb;
 let gameOver = 0;
 let backgroundMusic;
@@ -49,7 +49,7 @@ function draw() {
       r = round(random(30,35));
       g = round(random(30,35));
       b = round(random(30,35));
-      crgb = round(random(1,3));
+      changeRGB = round(random(1,3));
       aors = round(random(1,2));
       addOrSub();
       restart = 1;
@@ -65,7 +65,6 @@ function draw() {
 }
 
 function keyPressed() {
-  let volume = 1;
   if (keyCode === 38) {
     volume = volume + 0.1;
     backgroundMusic.setVolume(volume);
@@ -137,12 +136,12 @@ function addOrSub(){
 }
 
 function difColour(){
-  if(crgb === 1){
+  if(changeRGB === 1){
     nr = red + r;
     nb = blue;
     ng = green;
   }
-  else if(crgb === 2){
+  else if(changeRGB === 2){
     nr = red;
     nb = blue + b;
     ng = green;
