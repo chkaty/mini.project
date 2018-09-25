@@ -1,26 +1,26 @@
-// Project Title
-// Your Name
-// Date
-// Extra for Experts:
-// - describe what you did to take this project "above and beyond"
-let restart = 0;
-let hap =0;
+// Colour Game
+// Katychen
+// 2018/9/24
+// Extra for Experts:add some sound to my project
+// Added the background music and other sound affect, using for loop to draw rectangle.
+
+let restart = false;
 let timer = 60;
 let score = 0;
 let volume = 0.5;
 let coordinateX = [];
 let coordinateY = [];
 let red, green, blue;
-let aors;
+let addOrSubtract;
 let r,g,b;
 let changeRGB;
 let nr,ng,nb;
-let gameOver = 0;
+let gameOver = false;
 let backgroundMusic;
 let sound;
 let gameOverSound;
 let correct;
-let i;
+let rectPlace;
 let diff;
 let size;
 
@@ -33,16 +33,16 @@ function preload() {
 
 function setup() {
   createCanvas(windowWidth,windowHeight);
-  backgroundMusic.play();
+  backgroundMusic.loop();
 }
 
 function draw() {
-  if (gameOver === 0){
+  rectMode(CENTER);
+  if (!gameOver){
     background(220);
     fill(red,green,blue);
     page();
-    if (restart === 0){
-      i = round(random(0,29));
+    if (!restart){
       red = round(random(225));
       green = round(random(225));
       blue = round(random(225));
@@ -50,9 +50,10 @@ function draw() {
       g = round(random(30,35));
       b = round(random(30,35));
       changeRGB = round(random(1,3));
-      aors = round(random(1,2));
+      addOrSubtract = round(random(1,2));
+      rectPlace = round(random(0,coordinateX.length));
       addOrSub();
-      restart = 1;
+      restart = true;
     }
     fill(0);
     textSize(15/400*width);
@@ -64,6 +65,7 @@ function draw() {
   }
 }
 
+// change volume using up and down arrow
 function keyPressed() {
   if (keyCode === 38) {
     volume = volume + 0.1;
@@ -73,12 +75,14 @@ function keyPressed() {
     volume = volume - 0.1;
     backgroundMusic.setVolume(volume);
   }
-  console.log(volume);
+
 }
+
+// gameover when time equals 0
 function off(){
   if(timer <= 0){
     gameOverSound.play();
-    gameOver = 1;
+    gameOver = true;
     backgroundMusic.pause();
     background(220);
     fill(0);
@@ -88,14 +92,15 @@ function off(){
   }
 }
 
+// draw rectangles using for loop depends on window size
 function page() {
   noStroke();
-  diff = 60/400* width/2;
-  size = 55/400* width/2;
-  for (let x = diff - 20; x < width- diff; x = x + diff) {
-    for (let y = diff + 20; y < height- diff; y= y + diff) {
+  diff = 60/400* width/3;
+  size = 55/400* width/3;
+  for (let x = diff; x < width- size; x = x + diff) {
+    for (let y = diff + 20/400*width; y < height- diff; y= y + diff) {
       rect(x, y, size, size, 10);
-      if (restart === 0){
+      if (restart){
         append(coordinateX, x);
         append(coordinateY, y);
       }
@@ -103,21 +108,23 @@ function page() {
   }
 }
 
+// get a random position and color it different
 function find(){
   fill(nr,ng,nb);
-  rect(coordinateX[i],coordinateY[i], size, size, 10);
+  rect(coordinateX[rectPlace],coordinateY[rectPlace], size, size, 10);
+  console.log(coordinateX[rectPlace],coordinateY[rectPlace]);
 }
 
+// when click on different color change to next stage
 function mousePressed() {
-  if (gameOver === 0){
+  if (!gameOver){
     let currentColor = get(mouseX, mouseY);
     if(String(currentColor) !== "220,220,220,255"){
       if (mouseY > diff + 20){
         if(abs(red - currentColor[0])<= 35 && abs(red - currentColor[0])>= 30 || abs(green - currentColor[1])<= 35 && abs(green - currentColor[1])>= 30 || abs(blue - currentColor[2])<=35 && abs(blue - currentColor[2])>= 30){
           correct.play();
           score = score +1;
-          timer = timer +1;
-          restart = 0;
+          restart = false;
         }
         else{
           sound.play();
@@ -130,7 +137,7 @@ function mousePressed() {
 
 
 function addOrSub(){
-  if(aors === 2 && red > 35){
+  if(addOrSubtract === 2 && red > 35){
     r = r * -1;
   }
 }
@@ -155,13 +162,13 @@ function difColour(){
 
 function dscore(){
   textAlign(LEFT);
-  text("SCORE:"+" "+ score, 20/400*width, 30/400*height);
+  text("SCORE:"+" "+ score, 20/400*width, 40/400*height);
 
 }
 
 function countDown(){
   textAlign(RIGHT);
-  text("TIME:"+" "+ timer, 380/400*width, 30/400*height);
+  text("TIME:"+" "+ timer, 380/400*width, 40/400*height);
   if (frameCount % 60 === 0 && timer > 0) {
     timer --;
   }
