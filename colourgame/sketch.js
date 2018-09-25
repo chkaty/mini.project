@@ -37,6 +37,7 @@ function setup() {
 }
 
 function draw() {
+  rectMode(CENTER);
   if (!gameOver){
     background(220);
     fill(red,green,blue);
@@ -94,10 +95,10 @@ function off(){
 // draw rectangles using for loop depends on window size
 function page() {
   noStroke();
-  diff = 60/400* width/2;
-  size = 55/400* width/2;
-  for (let x = diff - 20; x < width- diff; x = x + diff) {
-    for (let y = diff + 20; y < height- diff; y= y + diff) {
+  diff = 60/400* width/3;
+  size = 55/400* width/3;
+  for (let x = diff; x < width- size; x = x + diff) {
+    for (let y = diff + 20/400*width; y < height- diff; y= y + diff) {
       rect(x, y, size, size, 10);
       if (restart){
         append(coordinateX, x);
@@ -161,13 +162,13 @@ function difColour(){
 
 function dscore(){
   textAlign(LEFT);
-  text("SCORE:"+" "+ score, 20/400*width, 30/400*height);
+  text("SCORE:"+" "+ score, 20/400*width, 40/400*height);
 
 }
 
 function countDown(){
   textAlign(RIGHT);
-  text("TIME:"+" "+ timer, 380/400*width, 30/400*height);
+  text("TIME:"+" "+ timer, 380/400*width, 40/400*height);
   if (frameCount % 60 === 0 && timer > 0) {
     timer --;
   }
