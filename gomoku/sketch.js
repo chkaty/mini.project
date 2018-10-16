@@ -34,9 +34,9 @@ function setup() {
     colorOfChess = false;
   }
   backgroundMusic.setVolume(0.3);
+  backgroundMusic.loop();
   // Instruction for game
   window.alert("Players alternate in placing a stone of their color on an empty intersection. The winner is the first player to get an unbroken row of five stones horizontally, vertically, or diagonally.");
-  backgroundMusic.loop();
 }
 
 function draw() {
@@ -236,6 +236,7 @@ function filledWithChess(){
 
 // show the end page after game ended
 function gameEndPage(){
+  backgroundMusic.stop();
   background(230);
   fill(0);
   textSize(36);
