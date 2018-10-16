@@ -112,7 +112,6 @@ function page() {
 function find(){
   fill(nr,ng,nb);
   rect(coordinateX[rectPlace],coordinateY[rectPlace], size, size, 10);
-  console.log(coordinateX[rectPlace],coordinateY[rectPlace]);
 }
 
 // when click on different color change to next stage
