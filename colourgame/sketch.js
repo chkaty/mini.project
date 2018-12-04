@@ -172,3 +172,7 @@ function countDown(){
     timer --;
   }
 }
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+}
