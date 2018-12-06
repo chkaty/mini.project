@@ -40,29 +40,40 @@ function learnWordScores() {
   //need to loop through the information from the text file, and assign appropriate scores to each word
   for (let line=0; line<reviewData.length; line++) {
     let wordList = reviewData[line].split(" ");
-    let score = Number(wordlist[0])
-    //add your logic here!!
-    // for(let i = 0; i< wordsToLookup.length; i++){
-    //   if wordlist[line].has(wordsToLookup[i]){
-    //     console.log(wordlist[line]);
-    console.log(score);
-    //       });
+    let score = Number(wordList[0])
+
+    for(let i = 1; i<wordsToLookup.length; i++){
+      if (wordList.has(wordsToLookup[i])){
+        let newScore = wordScore.get(wordList[i]).totalScore+score;
+        let newOccuranceSum = wordScore.get(wordList[i]).numberOfOccurance+1;
+        let newRage = newScore/newOccuranceSum
+        wordScore.set(wordList[i],{
+          totalScore: newScore,
+          numberOfOccurance: newOccuranceSum,
+          rage: newRage
+        });
+      }
+      else{
+        wordScore.set(wordList[i],{
+          totalScore: score,
+          numberOfOccurance: 1,
+          rage: score
+        });
       }
     }
   }
-  }
+}
 
 function runAnalysis() {
   let wordsToLookup = phraseInput.value().split(" ");
   // you need to look up each word typed in, which is given in the array above.
   // use those to calculate whether the average sentiment of all the words put together
-  }
 
 
 
   // leave the function call below in your code so that your results will be automatically displayed
   // note that you will need to use a variable called averageSentiment for this to work.
-  displayResults(averageSentiment);
+  // displayResults(averageSentiment);
 }
 
 function displayResults(averageSentiment) {
