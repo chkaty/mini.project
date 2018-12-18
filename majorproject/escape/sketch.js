@@ -22,7 +22,7 @@ function setup() {
 
   table = createSprite(270,550);
   table.addAnimation("normal","assets/table.png");
-  table.setCollider("rectangle", 0, 0, 100, 120);
+  table.setCollider("rectangle", 0, 0, 90, 139);
   table.onMousePressed = function() {
     tableZoom = true;
   };
@@ -58,7 +58,7 @@ function myCamera(sprite){
     camera.zoom = 3.5;
     camera.position.x = sprite.position.x;
     camera.position.y = sprite.position.y;
-    
+
   }
 }
 
