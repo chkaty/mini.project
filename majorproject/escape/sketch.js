@@ -6,10 +6,11 @@
 // - describe what you did to take this project "above and beyond"
 
 let object;
-let time = 0;
+let time = 1;
 let tools = [];
 let frame;
 let table, tableZoom;
+let backKeyPressed;
 let backgroundImage;
 function preload() {
   backgroundImage = loadImage("assets/background.png");
@@ -22,10 +23,14 @@ function setup() {
 
   table = createSprite(270,550);
   table.addAnimation("normal","assets/table.png");
-  table.setCollider("rectangle", 0, 0, 90, 139);
+  table.addAnimation("open","assets/table2.png");
+  table.setDefaultCollider();
   table.onMousePressed = function() {
     tableZoom = true;
+    time += 1;
+    console.log(tableZoom)
   };
+
 
   // object = createSprite(width/2, height/2);
   // object.addAnimation("normal","assets/object.png");
@@ -39,16 +44,10 @@ function setup() {
 
 function draw() {
   background(200);
-  image(backgroundImage,50,50)
-  image(door,900,230)
+  image(backgroundImage,50,50);
+  image(door,900,230);
   myCamera(table);
   drawSprites();
-  // if(time %2 !== 0){
-  //   object.addAnimation("turn","assets/triangle.png");
-  // }
-  // else{
-  //   object.addAnimation("turn","assets/object.png");
-  // }
   camera.off();
   image(frame, 0, 0);
 }
@@ -58,7 +57,19 @@ function myCamera(sprite){
     camera.zoom = 3.5;
     camera.position.x = sprite.position.x;
     camera.position.y = sprite.position.y;
+    table.setCollider ("rectangle",width/2-table.position.x,height/3-table.position.y,table.width*3,table.height);
+    // button = createSprite(270,600);
+    // button.addAnimation("normal","assets/button.png");
+    // button.setCollider("rectangle", 0, 0, 36, 19);
+    // button.onMousePressed = function() {
+    //   backKeyPressed = true;
+    // };
+    // drawSprites(button);
 
+    // table.changeAnimation("open");
+    // key = createSprite(270,510);
+    // key.addAnimation("normal","assets/key.png");
+    // drawSprites(key);
   }
 }
 
@@ -66,5 +77,13 @@ function toolBar(){
   let boxHeight = height/6;
   for(let i = 0; i < 6; i++){
     rect(width -70,boxHeight*1,50,50);
+  }
+}
+
+function back(){
+  if(backKeyPressed === true){
+    camera.zoom = 1;
+    camera.position.x = sprite.position.x;
+    camera.position.y = sprite.position.y;
   }
 }
