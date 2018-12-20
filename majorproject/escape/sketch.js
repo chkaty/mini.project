@@ -29,11 +29,13 @@ function setup() {
   table.onMousePressed = function() {
     tableZoom += 1;
     console.log(tableZoom)
+    console.log(tools)
   };
 
   key = createSprite(270,510);
   key.addAnimation("normal","assets/key.png");
   key.visible = false;
+  key.setCollider("rectangle",0,0,0,0);
   key.onMousePressed = function() {
     tools.push("key");
   };
@@ -47,33 +49,39 @@ function draw() {
   drawSprites();
   camera.off();
   image(frame, 0, 0);
-  console.log(tools)
 }
 
 function myCamera(sprite){
-  if(tableZoom === 2){
-    tableZoom += 1;
-    camera.zoom = 3.5;
-    camera.position.x = sprite.position.x;
-    camera.position.y = sprite.position.y;
-    table.setCollider ("rectangle",width/2-table.position.x,height/3-table.position.y,table.width*3,table.height);
-  }
-  else if(tableZoom %2 === 0){
-    table.changeAnimation("open");
-    if(tools.indexOf('key') < 0){
-      key.visible = true;
-      key.setCollider("rectangle",width/2-key.position.x,height/3-key.position.y,30,30);
+  if(tableZoom > 1){
+    if(tableZoom === 2){
+      tableZoom += 1;
+      camera.zoom = 3.5;
+      camera.position.x = sprite.position.x;
+      camera.position.y = sprite.position.y;
+      table.setCollider ("rectangle",width/2-table.position.x,height/3-table.position.y,table.width*3,table.height);
     }
-    else{
+
+    else if(tableZoom %2 === 0){
+      table.changeAnimation("open");
+      table.setCollider ("rectangle",width/2-table.position.x,height/2.25-table.position.y,table.width*3,table.height);
+      if(tools.indexOf('key') < 0){
+        key.visible = true;
+        key.setCollider("rectangle",width/2-key.position.x,height/3-key.position.y,30,30);
+      }
+      else{
+        key.setCollider("rectangle",0,0,0,0);
+        key.visible = false;
+      }
+    }
+
+    else if(tableZoom %2 !== 0){
       key.setCollider("rectangle",0,0,0,0);
       key.visible = false;
+      table.setCollider ("rectangle",width/2-table.position.x,height/3-table.position.y,table.width*3,table.height);
+      table.changeAnimation("normal");
     }
   }
-  else{
-    key.setCollider("rectangle",0,0,0,0);
-    key.visible = false;
-    table.changeAnimation("normal");
-  }
+
   // button = createSprite(270,600);
   // button.addAnimation("normal","assets/button.png");
   // button.setCollider("rectangle", 0, 0, 10, 5);
@@ -81,7 +89,6 @@ function myCamera(sprite){
   //   backKeyPressed = true;
   // };
   // drawSprites(button);
-
 }
 
 function toolBar(){
