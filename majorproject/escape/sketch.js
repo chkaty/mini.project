@@ -8,8 +8,7 @@
 let object;
 let tools = [];
 let frame;
-let table;
-let key;
+let table,door,key,button;
 let tableZoom = 1;
 let backKeyPressed;
 let backgroundImage;
@@ -41,7 +40,7 @@ function setup() {
   button = createSprite(270,620);
   button.addAnimation("normal","assets/button.png");
   button.visible = false;
-  button.setCollider("rectangle", 0, 0, 10, 5);
+  button.setCollider("rectangle", 0, 0, 0, 0);
   button.onMousePressed = function() {
     backKeyPressed = true;
   };
@@ -56,11 +55,13 @@ function draw() {
   drawSprites();
   camera.off();
   image(frame, 0, 0);
+  console.log(tableZoom);
 }
 
 function movementTable(){
   if(tableZoom > 1){
     button.visible = true;
+    button.setCollider("rectangle",width/2-table.position.x,height/1.4-table.position.y,30,30);
     if(tableZoom === 2){
       tableZoom += 1;
       camera.zoom = 3.5;
@@ -72,7 +73,7 @@ function movementTable(){
     else if(tableZoom %2 === 0){
       table.changeAnimation("open");
       table.setCollider ("rectangle",width/2-table.position.x,height/2.25-table.position.y,table.width*3,table.height);
-      if(tools.indexOf('key') < 0){
+      if(tools.indexOf("key") < 0){
         key.visible = true;
         setTimeout(function() {
           key.setCollider("rectangle",width/2-key.position.x,height/3.2-key.position.y,30,30);
@@ -93,18 +94,25 @@ function movementTable(){
   }
 }
 
-function toolBar(){
-  let boxHeight = height/6;
-  for(let i = 0; i < 6; i++){
-    rect(width -70,boxHeight*1,50,50);
-  }
-}
+// function toolBar(){
+//   let boxHeight = height/6;
+//   for(let i = 0; i < 6; i++){
+//     rect(width -70,boxHeight*1,50,50);
+//   }
+// }
 
 function back(){
   if(backKeyPressed === true){
+    camera.position.x = windowWidth/2;
+    camera.position.y = windowHeight/2;
     camera.zoom = 1;
-    camera.position.x = windowWidth;
-    camera.position.y = windowHeight;
-    buttom.visible = false;
+    button.visible = false;
+    backKeyPressed = false;
+    tableZoom = 1;
+    table.setDefaultCollider();
+    table.changeAnimation("normal");
+    key.setCollider("rectangle",0,0,0,0);
+    key.visible = false;
+    button.setCollider("rectangle",0,0,0,0);
   }
 }
