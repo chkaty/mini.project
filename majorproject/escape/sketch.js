@@ -47,21 +47,30 @@ class Movement{
   }
 }
 
+
+
+
 let tools = [];
 let myTable;
-let frame;
+let frame,tableKey;
 let table,door,key,button;
 let tableZoom = 1;
 let backKeyPressed;
 let backgroundImage;
 
+
+
 function preload() {
   backgroundImage = loadImage("assets/background.png");
 }
 
+
+
+
 function setup() {
   myTable = new Movement(413,-294,351,139);
   createCanvas(1366, 768);
+  tableKey = loadImage("assets/key.png");
   frame = loadImage("assets/frame.png");
   door = loadImage("assets/door.png");
 
@@ -78,7 +87,7 @@ function setup() {
   key.visible = false;
   key.setCollider("rectangle",0,0,0,0);
   key.onMousePressed = function() {
-    tools.push("key");
+    tools.push(tableKey);
   };
 
   button = createSprite(270,620);
@@ -99,7 +108,8 @@ function draw() {
   drawSprites();
   camera.off();
   image(frame, 0, 0);
-  console.log(width/2-key.position.x,height/3.2-key.position.y,30,30);
+  toolBar();
+  console.log(mouseX,mouseY)
 }
 
 function movementTable(){
@@ -113,7 +123,7 @@ function movementTable(){
     else if(tableZoom %2 === 0){
       myTable.y = -208.6;
       myTable.changed(table);
-      if(tools.indexOf("key") < 0){
+      if(tools.indexOf(tableKey) < 0){
         myTable.containOther(key,413,-270,30,30);
       }
       else{
@@ -129,12 +139,11 @@ function movementTable(){
   }
 }
 
-// function toolBar(){
-//   let boxHeight = height/6;
-//   for(let i = 0; i < 6; i++){
-//     rect(width -70,boxHeight*1,50,50);
-//   }
-// }
+function toolBar(){
+  for(let i=0; i<tools.length; i++){
+    image(tools[i], 1290, 120);
+  }
+}
 
 function back(){
   if(backKeyPressed === true){
