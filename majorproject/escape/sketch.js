@@ -5,18 +5,62 @@
 // Extra for Experts:
 // - describe what you did to take this project "above and beyond"
 
-let object;
+class Movement{
+  constructor(x,y,w,h){
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+  }
+
+  backButtonDisplay(){
+    button.visible = true;
+    button.setCollider("rectangle",width/2-table.position.x,height/1.4-table.position.y,30,30);
+  }
+
+  zoomedIn(object){
+    camera.zoom = 3.5;
+    camera.position.x = object.position.x;
+    camera.position.y = object.position.y;
+  }
+
+  normal(object){
+    object.setCollider ("rectangle",this.x,this.y,this.w,this.h);
+    object.changeAnimation("normal");
+  }
+
+  changed(object){
+    object.changeAnimation("open");
+    object.setCollider ("rectangle",this.x,this.y,this.w,this.h);
+  }
+
+  containOther(object,x,y,w,h){
+    object.visible = true;
+    setTimeout(function() {
+      object.setCollider("rectangle",x,y,w,h);
+    }, 500);
+  }
+
+  hideObject(object){
+    object.setCollider("rectangle",0,0,0,0);
+    object.visible = false;
+  }
+}
+
 let tools = [];
+let myTable;
 let frame;
 let table,door,key,button;
 let tableZoom = 1;
 let backKeyPressed;
 let backgroundImage;
+
 function preload() {
   backgroundImage = loadImage("assets/background.png");
 }
 
 function setup() {
+  myTable = new Movement(413,-294,351,139);
   createCanvas(1366, 768);
   frame = loadImage("assets/frame.png");
   door = loadImage("assets/door.png");
@@ -55,41 +99,32 @@ function draw() {
   drawSprites();
   camera.off();
   image(frame, 0, 0);
-  console.log(tableZoom);
+  console.log(width/2-key.position.x,height/3.2-key.position.y,30,30);
 }
 
 function movementTable(){
   if(tableZoom > 1){
-    button.visible = true;
-    button.setCollider("rectangle",width/2-table.position.x,height/1.4-table.position.y,30,30);
+    myTable.backButtonDisplay();
     if(tableZoom === 2){
+      myTable.zoomedIn(table);
       tableZoom += 1;
-      camera.zoom = 3.5;
-      camera.position.x = table.position.x;
-      camera.position.y = table.position.y;
-      table.setCollider ("rectangle",width/2-table.position.x,height/3-table.position.y,table.width*3,table.height);
     }
 
     else if(tableZoom %2 === 0){
-      table.changeAnimation("open");
-      table.setCollider ("rectangle",width/2-table.position.x,height/2.25-table.position.y,table.width*3,table.height);
+      myTable.y = -208.6;
+      myTable.changed(table);
       if(tools.indexOf("key") < 0){
-        key.visible = true;
-        setTimeout(function() {
-          key.setCollider("rectangle",width/2-key.position.x,height/3.2-key.position.y,30,30);
-        }, 500);
+        myTable.containOther(key,413,-270,30,30);
       }
       else{
-        key.setCollider("rectangle",0,0,0,0);
-        key.visible = false;
+        myTable.hideObject(key);
       }
     }
 
-    else if(tableZoom %2 !== 0){
-      key.setCollider("rectangle",0,0,0,0);
-      key.visible = false;
-      table.setCollider ("rectangle",width/2-table.position.x,height/3-table.position.y,table.width*3,table.height);
-      table.changeAnimation("normal");
+    else{
+      myTable.y = -294;
+      myTable.hideObject(key);
+      myTable.normal(table);
     }
   }
 }
@@ -103,8 +138,8 @@ function movementTable(){
 
 function back(){
   if(backKeyPressed === true){
-    camera.position.x = windowWidth/2;
-    camera.position.y = windowHeight/2;
+    camera.position.x = width/2;
+    camera.position.y = height/2;
     camera.zoom = 1;
     button.visible = false;
     backKeyPressed = false;
