@@ -13,9 +13,11 @@ class Movement{
     this.h = h;
   }
 
-  backButtonDisplay(){
+  backButtonDisplay(x,y,posX,posY){
     button.visible = true;
-    button.setCollider("rectangle",width/2-table.position.x,height/1.4-table.position.y,30,30);
+    button.setCollider("rectangle",posX, posY, 30, 30);
+    button.x = x;
+    button.y = y;
   }
 
   zoomedIn(object){
@@ -53,8 +55,9 @@ class Movement{
 let tools = [];
 let myTable;
 let frame,tableKey;
-let table,door,key,button;
+let table,door,key,button,bookshelf,bookshelfDoor;
 let tableZoom = 1;
+let bookshelfDoorOpened = 1;
 let backKeyPressed;
 let backgroundImage;
 
@@ -69,10 +72,13 @@ function preload() {
 
 function setup() {
   myTable = new Movement(413,-294,351,139);
+  myBookshelfDoor = new Movement(413,-294,400,200);
+
   createCanvas(1366, 768);
   tableKey = loadImage("assets/key.png");
   frame = loadImage("assets/frame.png");
   door = loadImage("assets/door.png");
+  bookshelf = loadImage("assets/bookshelf.png");
 
   table = createSprite(270,550);
   table.addAnimation("normal","assets/table.png");
@@ -90,31 +96,59 @@ function setup() {
     tools.push(tableKey);
   };
 
-  button = createSprite(270,620);
+  button = createSprite(434,425);
   button.addAnimation("normal","assets/button.png");
-  button.visible = false;
+  //button.visible = false;
   button.setCollider("rectangle", 0, 0, 0, 0);
   button.onMousePressed = function() {
     backKeyPressed = true;
   };
+
+  bookshelfDoor = createSprite(438,353);
+  bookshelfDoor.addAnimation("normal","assets/bookshelfDoor.png");
+  bookshelfDoor.addAnimation("open","assets/bookshelfDoor1.png");
+  bookshelfDoor.setDefaultCollider();
+  bookshelfDoor.onMousePressed = function() {
+    bookshelfDoorOpened += 1;
+  };
+
 }
 
 function draw() {
   background(200);
   image(backgroundImage,50,50);
   image(door,900,230);
-  movementTable();
+  image(bookshelf,350,290);
+  //movementTable();
+  movementBookshelfDoor();
   back();
   drawSprites();
   camera.off();
   image(frame, 0, 0);
   toolBar();
-  console.log(mouseX,mouseY)
+  console.log(bookshelfDoorOpened);
+}
+
+function movementBookshelfDoor(){
+  if(bookshelfDoorOpened > 1){
+    myBookshelfDoor.backButtonDisplay(434,389,0,0);
+    table.setCollider("rectangle", 0, 0, 0, 0);
+  }
+  if(bookshelfDoorOpened === 2){
+    myBookshelfDoor.zoomedIn(bookshelfDoor);
+    bookshelfDoorOpened += 1;
+  }
+  else if(bookshelfDoorOpened %2 === 0){
+    myBookshelfDoor.changed(bookshelfDoor);
+    }
+  else{
+    myBookshelfDoor.normal(table);
+  }
 }
 
 function movementTable(){
   if(tableZoom > 1){
-    myTable.backButtonDisplay();
+    myTable.backButtonDisplay(270,620,413,-1.4);
     if(tableZoom === 2){
       myTable.zoomedIn(table);
       tableZoom += 1;
@@ -152,6 +186,9 @@ function back(){
     camera.zoom = 1;
     button.visible = false;
     backKeyPressed = false;
+    bookshelfDoorOpened = 1;
+    bookshelfDoor.setDefaultCollider();
+    bookshelfDoor.changeAnimation("normal");
     tableZoom = 1;
     table.setDefaultCollider();
     table.changeAnimation("normal");
