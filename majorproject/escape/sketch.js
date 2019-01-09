@@ -53,6 +53,7 @@ class Movement{
 
 
 let tools = [];
+let bar = [0,0,0,0,0,0];
 let myTable,myBookshelfDoor;
 let frame,tableKey;
 let table,door,key,button,bookshelf,bookshelfDoor;
@@ -93,7 +94,11 @@ function setup() {
   key.visible = false;
   key.setCollider("rectangle",0,0,0,0);
   key.onMousePressed = function() {
-    tools.push(tableKey);
+    myTableKey = {
+      "name": "tableKey",
+      "sprite":tableKey
+    };
+    tools.push(myTableKey);
   };
 
   button = createSprite(270,620);
@@ -169,7 +174,6 @@ function movementTable(){
         myTable.hideObject(key);
       }
     }
-
     else{
       myTable.y = -294;
       myTable.hideObject(key);
@@ -180,7 +184,10 @@ function movementTable(){
 
 function toolBar(){
   for(let i=0; i<tools.length; i++){
-    image(tools[i], 1290, 120);
+    if(bar[i] === 0){
+      //bar[i] = tools[i].name;
+      image(tools[i].sprite, 1290, 120);
+    }
   }
 }
 
