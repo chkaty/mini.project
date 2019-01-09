@@ -16,8 +16,8 @@ class Movement{
   backButtonDisplay(x,y,posX,posY){
     button.visible = true;
     button.setCollider("rectangle",posX, posY, 30, 30);
-    button.x = x;
-    button.y = y;
+    button.position.x = x;
+    button.position.y = y;
   }
 
   zoomedIn(object){
@@ -53,7 +53,7 @@ class Movement{
 
 
 let tools = [];
-let myTable;
+let myTable,myBookshelfDoor;
 let frame,tableKey;
 let table,door,key,button,bookshelf,bookshelfDoor;
 let tableZoom = 1;
@@ -72,7 +72,7 @@ function preload() {
 
 function setup() {
   myTable = new Movement(413,-294,351,139);
-  myBookshelfDoor = new Movement(413,-294,400,200);
+  myBookshelfDoor = new Movement(240,30,525,250);
 
   createCanvas(1366, 768);
   tableKey = loadImage("assets/key.png");
@@ -96,9 +96,9 @@ function setup() {
     tools.push(tableKey);
   };
 
-  button = createSprite(434,425);
+  button = createSprite(270,620);
   button.addAnimation("normal","assets/button.png");
-  //button.visible = false;
+  button.visible = false;
   button.setCollider("rectangle", 0, 0, 0, 0);
   button.onMousePressed = function() {
     backKeyPressed = true;
@@ -119,30 +119,35 @@ function draw() {
   image(backgroundImage,50,50);
   image(door,900,230);
   image(bookshelf,350,290);
-  //movementTable();
+  movementTable();
   movementBookshelfDoor();
   back();
   drawSprites();
   camera.off();
   image(frame, 0, 0);
   toolBar();
-  console.log(bookshelfDoorOpened);
 }
 
 function movementBookshelfDoor(){
   if(bookshelfDoorOpened > 1){
-    myBookshelfDoor.backButtonDisplay(434,389,0,0);
+    myBookshelfDoor.backButtonDisplay(434,425,230,210);
     table.setCollider("rectangle", 0, 0, 0, 0);
-  }
-  if(bookshelfDoorOpened === 2){
-    myBookshelfDoor.zoomedIn(bookshelfDoor);
-    bookshelfDoorOpened += 1;
-  }
-  else if(bookshelfDoorOpened %2 === 0){
-    myBookshelfDoor.changed(bookshelfDoor);
+    if(bookshelfDoorOpened === 2){
+      myBookshelfDoor.zoomedIn(bookshelfDoor);
+      bookshelfDoorOpened += 1;
     }
-  else{
-    myBookshelfDoor.normal(table);
+    if(tools.indexOf(tableKey) >= 0){
+      if(bookshelfDoorOpened %2 === 0){
+        myBookshelfDoor.x = 610;
+        bookshelfDoor.position.x = 590;
+        myBookshelfDoor.changed(bookshelfDoor);
+      }
+      else{
+        myBookshelfDoor.x = 240;
+        bookshelfDoor.position.x = 438;
+        myBookshelfDoor.normal(bookshelfDoor);
+      }
+    }
   }
 }
 
@@ -184,16 +189,21 @@ function back(){
     camera.position.x = width/2;
     camera.position.y = height/2;
     camera.zoom = 1;
+
     button.visible = false;
     backKeyPressed = false;
+    button.setCollider("rectangle",0,0,0,0);
+
     bookshelfDoorOpened = 1;
     bookshelfDoor.setDefaultCollider();
     bookshelfDoor.changeAnimation("normal");
+    bookshelfDoor.position.x = 438;
+
     tableZoom = 1;
     table.setDefaultCollider();
     table.changeAnimation("normal");
+
     key.setCollider("rectangle",0,0,0,0);
     key.visible = false;
-    button.setCollider("rectangle",0,0,0,0);
   }
 }
