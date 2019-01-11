@@ -63,7 +63,7 @@ class Movement{
 
 let tools = [0,0,0,0,0,0];
 let myTable,myBookshelfDoor;
-let tableKeyChoosed;
+let tableKeyChoosed,choosed;
 let frame,tableKey;
 let table,door,key,button,bookshelf,bookshelfDoor;
 let tableZoom = 1;
@@ -154,12 +154,13 @@ function movementBookshelfDoor(){
         myBookshelfDoor.x = 610;
         bookshelfDoor.position.x = 590;
         myBookshelfDoor.changed(bookshelfDoor);
+        tableKey.visible = false;
+        choosed = false;
       }
       else{
         myBookshelfDoor.x = 240;
         bookshelfDoor.position.x = 438;
         myBookshelfDoor.normal(bookshelfDoor);
-        tableKey.visible = false;
       }
     }
   }
@@ -200,15 +201,20 @@ function toolBar(){
 }
 
 function mouseOnTop(){
-  if(mouseX > 1260 && mouseX < 1335 &&  mouseY > 90 && mouseY <170){
+  if(mouseX > 1260 && mouseX < 1335 &&  mouseY > 90 && mouseY <170 && tools[0] !== 0){
     rectMode(CENTER);
     fill(0,0,0,50);
     rect(1298,128.5,70,70,10);
     if(mouseIsPressed && tools[0] === tableKey){
       tableKeyChoosed = true;
-      rect(1298,128.5,70,70,10);
-      bookshelfDoorOpened = 3;
+      choosed = true;
+      if(bookshelfDoorOpened>3){
+        bookshelfDoorOpened = 3;
+      }
     }
+  }
+  if(choosed === true){
+    rect(1298,128.5,70,70,10);
   }
 }
 
