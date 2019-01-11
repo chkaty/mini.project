@@ -48,10 +48,19 @@ class Movement{
     object.visible = false;
   }
 
-  appendIntoToolsBar(object){
+  appendIntoTools(object){
     for(let i = 0; i<tools.length; i++){
       if(tools[i] === 0){
         tools[i] = object;
+        break;
+      }
+    }
+  }
+
+  deleteFromTools(object){
+    for(let i = 0; i<tools.length; i++){
+      if(tools[i] === object){
+        tools[i] = 0;
         break;
       }
     }
@@ -63,7 +72,7 @@ class Movement{
 
 let tools = [0,0,0,0,0,0];
 let myTable,myBookshelfDoor;
-let tableKeyChoosed,choosed;
+let tableKeyChoosed = false,choosed;
 let frame,tableKey;
 let table,door,key,button,bookshelf,bookshelfDoor;
 let tableZoom = 1;
@@ -105,7 +114,7 @@ function setup() {
   key.setCollider("rectangle",0,0,0,0);
   key.onMousePressed = function() {
     tableKey.name = "tableKey";
-    myTable.appendIntoToolsBar(tableKey);
+    myTable.appendIntoTools(tableKey);
   };
 
   button = createSprite(270,620);
@@ -138,7 +147,6 @@ function draw() {
   camera.off();
   image(frame, 0, 0);
   toolBar();
-  mouseOnTop();
 }
 
 function movementBookshelfDoor(){
@@ -155,7 +163,8 @@ function movementBookshelfDoor(){
         bookshelfDoor.position.x = 590;
         myBookshelfDoor.changed(bookshelfDoor);
         tableKey.visible = false;
-        choosed = false;
+        choosed = -1;
+        myTable.deleteFromTools(tableKey);
       }
       else{
         myBookshelfDoor.x = 240;
@@ -195,28 +204,45 @@ function movementTable(){
 function toolBar(){
   for(let i=0; i<tools.length; i++){
     if(tools[i] !== 0 && tableKey.visible === true){
-      image(tools[i], 1290, 120);
+      image(tools[i], 1290, 123);
+    }
+    if(mouseX > 1260 && mouseX < 1335 &&  mouseY > 90+100*i && mouseY < 175+102*i && tools[i] !== 0){
+      console.log(i)
+      rectMode(CENTER);
+      fill(0,0,0,50);
+      rect((1260+1335)/2,((90+100*i)+(175+100*i))/2-5,70,70,10);
+      if(mouseIsPressed && tools[0] === tableKey){
+        tableKeyChoosed = true;
+        choosed = 0;
+        if(bookshelfDoorOpened>3){
+          bookshelfDoorOpened = 3;
+        }
+      }
+    }
+    if(choosed > -1){
+      fill(0,0,0,10);
+      rect((1260+1335)/2,((90+100*choosed)+(175+105*choosed))/2-5,70,70,10);
     }
   }
 }
 
-function mouseOnTop(){
-  if(mouseX > 1260 && mouseX < 1335 &&  mouseY > 90 && mouseY <170 && tools[0] !== 0){
-    rectMode(CENTER);
-    fill(0,0,0,50);
-    rect(1298,128.5,70,70,10);
-    if(mouseIsPressed && tools[0] === tableKey){
-      tableKeyChoosed = true;
-      choosed = true;
-      if(bookshelfDoorOpened>3){
-        bookshelfDoorOpened = 3;
-      }
-    }
-  }
-  if(choosed === true){
-    rect(1298,128.5,70,70,10);
-  }
-}
+// function mouseOnTop(){
+//   if(mouseX > 1260 && mouseX < 1335 &&  mouseY > 190 && mouseY < 272 && tools[0] !== 0 && tableKeyChoosed === false){
+//     rectMode(CENTER);
+//     fill(0,0,0,50);
+//     rect((1260+1335)/2,(90+170)/2,70,70,10);
+//     if(mouseIsPressed && tools[0] === tableKey){
+//       tableKeyChoosed = true;
+//       choosed = true;
+//       if(bookshelfDoorOpened>3){
+//         bookshelfDoorOpened = 3;
+//       }
+//     }
+//   }
+//   if(choosed === true){
+//     rect(1298,128.5,70,70,10);
+//   }
+// }
 
 
 function back(){
