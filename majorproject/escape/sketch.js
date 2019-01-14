@@ -93,12 +93,11 @@ let books = [];
 let toolbar = [0,0,0,0,0,0];
 let myTable,myBookshelfDoor;
 let tableKeyChoosed = false,choosed;
-let frame,tableKey,picture,sofa;
-let table,door,key,button,bookshelf,bookshelfDoor;
+let frame,tableKey,picture,sofa,bookPile;
+let table,door,key,button,bookshelf,bookshelfDoor,lowerBookshelfDoor,note;
 let book1,book2,book3,book4,book5,book6,bookOpened = false;
 let counter1 = 0, counter2 = 0, counter3 = 0, counter4 = 0, counter5 = 0, counter6 = 0;
-let tableZoom = 1;
-let bookshelfDoorOpened = 1;
+let tableZoom = 1, bookshelfDoorOpened = 1, noteOpened = 1;
 let backKeyPressed;
 let backgroundImage;
 
@@ -120,6 +119,7 @@ function setup() {
   tableKey.visible = true;
   frame = loadImage("assets/frame.png");
   sofa = loadImage("assets/sofa.png");
+  bookPile = loadImage("assets/bookPile.png");
   picture = loadImage("assets/picture.png");
   door = loadImage("assets/door.png");
   bookshelf = loadImage("assets/bookshelf.png");
@@ -229,6 +229,18 @@ function setup() {
   bookshelfDoor.onMousePressed = function() {
     bookshelfDoorOpened += 1;
   };
+
+  lowerBookshelfDoor = createSprite(438.5,515);
+  lowerBookshelfDoor.addAnimation("normal","assets/bookshelfDoor2.png");
+  lowerBookshelfDoor.addAnimation("open","assets/bookshelfDoor2o.png");
+
+  note = createSprite(750,500);
+  note.addAnimation("normal","assets/note.png");
+  note.addAnimation("open","assets/notez.png");
+  note.setDefaultCollider();
+  note.onMousePressed = function() {
+    noteOpened += 1;
+  };
 }
 
 function draw() {
@@ -237,8 +249,10 @@ function draw() {
   image(bookshelf,350,290);
   image(picture,600,230);
   image(sofa,550,450);
+  image(bookPile,363,485);
   movementTable();
   movementBookshelfDoor();
+  movementNote();
   checkBook();
   back();
   drawSprites();
@@ -301,6 +315,9 @@ function checkBook(){
       }
     }
     backToNormal();
+    if(bookOpened){
+      lowerBookshelfDoor.changeAnimation("open");
+    }
   }
 }
 
@@ -319,6 +336,22 @@ function backToNormal(){
   book4.changeAnimation("normal");
   book5.changeAnimation("normal");
   book6.changeAnimation("normal");
+}
+
+function movementNote(){
+  if(noteOpened %2 === 0){
+    note.position.x = width/2;
+    note.position.y = height/2;
+    note.changeAnimation("open");
+    note.setCollider("rectangle",width/2,height/2,300,700);
+    bookshelfDoor.setCollider("rectangle",0,0,0,0);
+    table.setCollider("rectangle",0,0,0,0);
+  }
+  else{
+    note.position.x = 750;
+    note.position.y = 500;
+    note.changeAnimation("normal");
+  }
 }
 
 function movementTable(){
