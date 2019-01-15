@@ -90,11 +90,12 @@ class Movement{
 
 let tools = [];
 let books = [];
+let scene = 1;
 let toolbar = [0,0,0,0,0,0];
 let myTable,myBookshelfDoor;
 let choosed;
 let frame,tableKey,picture,sofa,bookPile,screwdriver1;
-let table,door,key,button,bookshelf,bookshelfDoor,lowerBookshelfDoor,note,screwdriver;
+let table,door,key,button,bookshelf,bookshelfDoor,lowerBookshelfDoor,note,screwdriver,leftButton;
 let book1,book2,book3,book4,book5,book6,bookOpened = false;
 let counter1 = 0, counter2 = 0, counter3 = 0, counter4 = 0, counter5 = 0, counter6 = 0;
 let tableZoom = 1, bookshelfDoorOpened = 1, noteOpened = 1;
@@ -121,6 +122,7 @@ function setup() {
   screwdriver1.choosed = false;
   tableKey.visible = true;
   frame = loadImage("assets/frame.png");
+
   sofa = loadImage("assets/sofa.png");
   bookPile = loadImage("assets/bookPile.png");
   picture = loadImage("assets/picture.png");
@@ -236,11 +238,11 @@ function setup() {
   screwdriver = createSprite(470,555);
   screwdriver.addAnimation("normal","assets/screwdriver.png");
   screwdriver.onMousePressed = function() {
-    screwdriver.visible = false;
-    screwdriver.setCollider("rectangle",0,0,0,0);
-    screwdriver1.name = "Screw Driver";
-    tools.push(screwdriver);
-    myBookshelfDoor.appendIntoTools(screwdriver1);
+  screwdriver.visible = false;
+  screwdriver.setCollider("rectangle",0,0,0,0);
+  screwdriver1.name = "Screw Driver";
+  tools.push(screwdriver);
+  myBookshelfDoor.appendIntoTools(screwdriver1);
   };
 
   lowerBookshelfDoor = createSprite(438.5,515);
@@ -255,25 +257,74 @@ function setup() {
     noteOpened += 1;
   };
 
+  leftButton = createSprite(100,height/2);
+  leftButton.addAnimation("normal","assets/leftButton.png");
+  leftButton.setDefaultCollider();
+  leftButton.onMousePressed = function() {
+    scene = 2;
+    leftKeyPressed();
+  };
+
+  rightButton = createSprite(1200,height/2);
+  rightButton.addAnimation("normal","assets/rightButton.png");
+  rightButton.setDefaultCollider();
+  rightButton.visible = false;
+  rightButton.onMousePressed = function() {
+    scene = 1;
+    rightKeyPressed();
+  };
 }
 
 function draw() {
-  screwdriver.debug = mouseIsPressed;
   image(backgroundImage,50,50);
-  image(door,900,230);
-  image(bookshelf,350,290);
-  image(picture,600,230);
-  image(sofa,550,450);
-  image(bookPile,363,485);
-  movementTable();
-  movementBookshelfDoor();
-  movementNote();
-  checkBook();
+  if(scene === 2){
+
+  }
+
+  if(scene === 1){
+    image(door,900,230);
+    image(bookshelf,350,290);
+    image(picture,600,230);
+    image(sofa,550,450);
+    image(bookPile,363,485);
+    movementTable();
+    movementBookshelfDoor();
+    movementNote();
+    checkBook();
+  }
   back();
   drawSprites();
   camera.off();
   image(frame, 0, 0);
   toolBar();
+}
+
+
+
+function movementTable(){
+  if(tableZoom > 1){
+    myTable.backButtonDisplay(270,620,413,-1.4);
+    if(tableZoom === 2){
+      myTable.zoomedIn(table);
+      tableZoom += 1;
+    }
+
+    else if(tableZoom %2 === 0){
+      myTable.y = -208.6;
+      myTable.changed(table);
+      if(tools.indexOf(tableKey) < 0){
+        myTable.containOther(key,413,-270,32,32);
+      }
+      else{
+        myTable.hideObject(key);
+      }
+    }
+    else{
+      myTable.y = -294;
+      myTable.hideObject(key);
+      myTable.normal(table);
+    }
+  }
 }
 
 function movementBookshelfDoor(){
@@ -309,6 +360,9 @@ function movementBookshelfDoor(){
     }
   }
 }
+
+
+
 
 function movementBook(){
   setTimeout(function() {
@@ -355,6 +409,9 @@ function backToNormal(){
   book6.changeAnimation("normal");
 }
 
+
+
+
 function movementNote(){
   if(noteOpened %2 === 0){
     note.position.x = width/2;
@@ -379,31 +436,7 @@ function movementNote(){
   }
 }
 
-function movementTable(){
-  if(tableZoom > 1){
-    myTable.backButtonDisplay(270,620,413,-1.4);
-    if(tableZoom === 2){
-      myTable.zoomedIn(table);
-      tableZoom += 1;
-    }
 
-    else if(tableZoom %2 === 0){
-      myTable.y = -208.6;
-      myTable.changed(table);
-      if(tools.indexOf(tableKey) < 0){
-        myTable.containOther(key,413,-270,32,32);
-      }
-      else{
-        myTable.hideObject(key);
-      }
-    }
-    else{
-      myTable.y = -294;
-      myTable.hideObject(key);
-      myTable.normal(table);
-    }
-  }
-}
 
 function toolBar(){
   myTable.checkRepeat(tableKey);
@@ -461,4 +494,36 @@ function back(){
 
     backToNormal();
   }
+}
+
+function leftKeyPressed(){
+  note.visible = false;
+  lowerBookshelfDoor.visible = false;
+  screwdriver.visible = false;
+  book1.visible = false;
+  book2.visible = false;
+  book3.visible = false;
+  book4.visible = false;
+  book5.visible = false;
+  book6.visible = false;
+  bookshelfDoor.visible = false;
+  table.visible = false;
+  leftButton.visible = false;
+  rightButton.visible = true;
+}
+
+function rightKeyPressed(){
+  rightButton.visible = false;
+  note.visible = true;
+  lowerBookshelfDoor.visible = true;
+  screwdriver.visible = true;
+  book1.visible = true;
+  book2.visible = true;
+  book3.visible = true;
+  book4.visible = true;
+  book5.visible = true;
+  book6.visible = true;
+  bookshelfDoor.visible = true;
+  table.visible = true;
+  leftButton.visible = true;
 }
