@@ -92,9 +92,9 @@ let tools = [];
 let books = [];
 let toolbar = [0,0,0,0,0,0];
 let myTable,myBookshelfDoor;
-let tableKeyChoosed = false,choosed;
-let frame,tableKey,picture,sofa,bookPile;
-let table,door,key,button,bookshelf,bookshelfDoor,lowerBookshelfDoor,note;
+let choosed;
+let frame,tableKey,picture,sofa,bookPile,screwdriver1;
+let table,door,key,button,bookshelf,bookshelfDoor,lowerBookshelfDoor,note,screwdriver;
 let book1,book2,book3,book4,book5,book6,bookOpened = false;
 let counter1 = 0, counter2 = 0, counter3 = 0, counter4 = 0, counter5 = 0, counter6 = 0;
 let tableZoom = 1, bookshelfDoorOpened = 1, noteOpened = 1;
@@ -115,7 +115,10 @@ function setup() {
   myBookshelfDoor = new Movement(240,30,525,250);
 
   createCanvas(1366, 768);
-  tableKey = loadImage("assets/key.png");
+  tableKey = loadImage("assets/tableKey.png");
+  tableKey.choosed = false;
+  screwdriver1 = loadImage("assets/screwdriver1.png");
+  screwdriver1.choosed = false;
   tableKey.visible = true;
   frame = loadImage("assets/frame.png");
   sofa = loadImage("assets/sofa.png");
@@ -230,6 +233,16 @@ function setup() {
     bookshelfDoorOpened += 1;
   };
 
+  screwdriver = createSprite(470,555);
+  screwdriver.addAnimation("normal","assets/screwdriver.png");
+  screwdriver.onMousePressed = function() {
+    screwdriver.visible = false;
+    screwdriver.setCollider("rectangle",0,0,0,0);
+    screwdriver1.name = "Screw Driver";
+    tools.push(screwdriver);
+    myBookshelfDoor.appendIntoTools(screwdriver1);
+  };
+
   lowerBookshelfDoor = createSprite(438.5,515);
   lowerBookshelfDoor.addAnimation("normal","assets/bookshelfDoor2.png");
   lowerBookshelfDoor.addAnimation("open","assets/bookshelfDoor2o.png");
@@ -241,9 +254,11 @@ function setup() {
   note.onMousePressed = function() {
     noteOpened += 1;
   };
+
 }
 
 function draw() {
+  screwdriver.debug = mouseIsPressed;
   image(backgroundImage,50,50);
   image(door,900,230);
   image(bookshelf,350,290);
@@ -265,11 +280,12 @@ function movementBookshelfDoor(){
   if(bookshelfDoorOpened > 1){
     myBookshelfDoor.backButtonDisplay(434,425,230,210);
     table.setCollider("rectangle", 0, 0, 0, 0);
+    note.setCollider("rectangle",0,0,0,0);
     if(bookshelfDoorOpened === 2){
       myBookshelfDoor.zoomedIn(bookshelfDoor);
       bookshelfDoorOpened += 1;
     }
-    if(tableKeyChoosed === true){
+    if(tableKey.choosed === true){
       if(bookshelfDoorOpened %2 === 0){
         myBookshelfDoor.x = 610;
         bookshelfDoor.position.x = 590;
@@ -317,6 +333,7 @@ function checkBook(){
     backToNormal();
     if(bookOpened){
       lowerBookshelfDoor.changeAnimation("open");
+      screwdriver.setDefaultCollider();
     }
   }
 }
@@ -343,11 +360,19 @@ function movementNote(){
     note.position.x = width/2;
     note.position.y = height/2;
     note.changeAnimation("open");
-    note.setCollider("rectangle",width/2,height/2,300,700);
+    note.setCollider("rectangle",5,40,270,370);
     bookshelfDoor.setCollider("rectangle",0,0,0,0);
     table.setCollider("rectangle",0,0,0,0);
   }
   else{
+    note.setDefaultCollider();
+    if(tableZoom < 2){
+      table.setDefaultCollider();
+
+    }
+    if(bookshelfDoorOpened < 2){
+      bookshelfDoor.setDefaultCollider();
+    }
     note.position.x = 750;
     note.position.y = 500;
     note.changeAnimation("normal");
@@ -383,15 +408,15 @@ function movementTable(){
 function toolBar(){
   myTable.checkRepeat(tableKey);
   for(let i=0; i<toolbar.length; i++){
-    if(toolbar[i] !== 0 && tableKey.visible === true){
-      image(toolbar[i], 1290, 123);
+    if(toolbar[0] !== 0){
+      image(toolbar[0], 1260, 100);
     }
     if(mouseX > 1260 && mouseX < 1335 &&  mouseY > 90+100*i && mouseY < 175+102*i && toolbar[i] !== 0){
       rectMode(CENTER);
       fill(0,0,0,50);
       rect((1260+1335)/2,(90+100*i+175+100*i)/2-5,70,70,10);
-      if(mouseIsPressed && toolbar[0] === tableKey){
-        tableKeyChoosed = true;
+      if(mouseIsPressed && toolbar[0] !== 0){
+        toolbar[0].choosed = true;
         choosed = 0;
         if(bookshelfDoorOpened>3){
           bookshelfDoorOpened = 3;
@@ -412,6 +437,8 @@ function toolBar(){
 
 function back(){
   if(backKeyPressed === true){
+    note.setDefaultCollider();
+
     camera.position.x = width/2;
     camera.position.y = height/2;
     camera.zoom = 1;
