@@ -15,7 +15,7 @@ class Movement{
 
   backButtonDisplay(x,y,posX,posY){
     button.visible = true;
-    button.setCollider("rectangle",posX, posY, 100, 100);
+    button.setCollider("rectangle",posX, posY, 30, 30);
     button.position.x = x;
     button.position.y = y;
   }
@@ -94,7 +94,7 @@ let scene = 1;
 let toolbar = [0,0,0,0,0,0];
 let myTable,myBookshelfDoor,myMirror;
 let choosed;
-let frame,tableKey,picture,sofa,bookPile,screwdriver1,hint,clock,wood;
+let frame,tableKey,picture,sofa,bookPile,screwdriver1,hint,clock,wood,glass;
 let table,door,key,button,bookshelf,bookshelfDoor,lowerBookshelfDoor,note,screwdriver,leftButton,rightButton,mirror,cover;
 let book1,book2,book3,book4,book5,book6,bookOpened = false;
 let counter1 = 0, counter2 = 0, counter3 = 0, counter4 = 0, counter5 = 0, counter6 = 0;
@@ -121,6 +121,7 @@ function setup() {
   wood = loadImage("assets/wood.png");
   clock = loadImage("assets/clock.png");
   tableKey = loadImage("assets/tableKey.png");
+  glass = loadImage("assets/glass.png");
   tableKey.choosed = false;
   screwdriver1 = loadImage("assets/screwdriver1.png");
   screwdriver1.choosed = false;
@@ -277,6 +278,11 @@ function setup() {
   mirror.addAnimation("broke","assets/mirrorb.png");
   mirror.addAnimation("bleed","assets/peopleb.png");
   mirror.visible = false;
+  mirror.onMousePressed = function() {
+    glass.name = "Glass";
+    tools.push(mirror);
+    myMirror.appendIntoTools(glass);
+  };
 
   cover = createSprite(900,313);
   cover.addAnimation("normal","assets/mirror1.png");
@@ -295,8 +301,7 @@ function setup() {
 }
 
 function draw() {
-  cover.debug = mouseIsPressed;
-  button.debug = mouseIsPressed;
+  rightButton.debug = mouseIsPressed;
   image(backgroundImage,50,50);
   if(scene === 2){
     image(clock,400,130);
@@ -462,11 +467,11 @@ function movementNote(){
 
 function movementMirror(){
   if(mirrorZoom > 1){
-    myMirror.backButtonDisplay(900,380,-200,100);
+    myMirror.backButtonDisplay(900,380,-210,230);
     cover.setCollider("rectangle",-200,0,730,600);
     if(mirrorZoom  === 2){
       myMirror.zoomedIn(cover);
-      rightButton.visible = false
+      rightButton.visible = false;
       mirror.changeAnimation("zoomedIn");
     }
     if(mirrorZoom  === 3){
@@ -474,6 +479,7 @@ function movementMirror(){
     }
     if(mirrorZoom  === 4){
       mirror.changeAnimation("bleed");
+      mirror.setCollider("rectangle",-300,100,100,100);
     }
   }
 }
@@ -538,6 +544,9 @@ function back(){
     }
 
     if(scene === 2){
+      rightButton.visible = true;
+      rightButton.setDefaultCollider;
+
       cover.setDefaultCollider();
       mirrorZoom = 1;
       mirror.changeAnimation("normal");
@@ -564,6 +573,7 @@ function leftKeyPressed(){
 
   table.setCollider("rectangle",0,0,0,0);
   cover.setDefaultCollider();
+  mirror.setCollider("rectangle",0,0,0,0);
 }
 
 function rightKeyPressed(){
@@ -585,4 +595,5 @@ function rightKeyPressed(){
 
   table.setDefaultCollider();
   cover.setCollider("rectangle",0,0,0,0);
+  rightButton.setCollider("rectangle",0,0,0,0);
 }
