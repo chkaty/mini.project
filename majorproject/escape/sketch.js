@@ -15,7 +15,7 @@ class Movement{
 
   backButtonDisplay(x,y,posX,posY){
     button.visible = true;
-    button.setCollider("rectangle",posX, posY, 30, 30);
+    button.setCollider("rectangle",posX, posY, 100, 100);
     button.position.x = x;
     button.position.y = y;
   }
@@ -92,13 +92,13 @@ let tools = [];
 let books = [];
 let scene = 1;
 let toolbar = [0,0,0,0,0,0];
-let myTable,myBookshelfDoor;
+let myTable,myBookshelfDoor,myMirror;
 let choosed;
-let frame,tableKey,picture,sofa,bookPile,screwdriver1;
-let table,door,key,button,bookshelf,bookshelfDoor,lowerBookshelfDoor,note,screwdriver,leftButton;
+let frame,tableKey,picture,sofa,bookPile,screwdriver1,hint,clock,wood;
+let table,door,key,button,bookshelf,bookshelfDoor,lowerBookshelfDoor,note,screwdriver,leftButton,rightButton,mirror,cover;
 let book1,book2,book3,book4,book5,book6,bookOpened = false;
 let counter1 = 0, counter2 = 0, counter3 = 0, counter4 = 0, counter5 = 0, counter6 = 0;
-let tableZoom = 1, bookshelfDoorOpened = 1, noteOpened = 1;
+let tableZoom = 1, bookshelfDoorOpened = 1, noteOpened = 1, mirrorZoom = 1;
 let backKeyPressed;
 let backgroundImage;
 
@@ -114,8 +114,12 @@ function preload() {
 function setup() {
   myTable = new Movement(413,-294,351,139);
   myBookshelfDoor = new Movement(240,30,525,250);
+  myMirror = new Movement(240,30,525,250);
 
   createCanvas(1366, 768);
+  hint = loadImage("assets/hint.png");
+  wood = loadImage("assets/wood.png");
+  clock = loadImage("assets/clock.png");
   tableKey = loadImage("assets/tableKey.png");
   tableKey.choosed = false;
   screwdriver1 = loadImage("assets/screwdriver1.png");
@@ -147,13 +151,6 @@ function setup() {
     myTable.appendIntoTools(tableKey);
   };
 
-  button = createSprite(270,620);
-  button.addAnimation("normal","assets/button.png");
-  button.visible = false;
-  button.setCollider("rectangle", 0, 0, 0, 0);
-  button.onMousePressed = function() {
-    backKeyPressed = true;
-  };
 
   book1 = createSprite(375,363);
   book1.addAnimation("normal","assets/book1.png");
@@ -238,11 +235,11 @@ function setup() {
   screwdriver = createSprite(470,555);
   screwdriver.addAnimation("normal","assets/screwdriver.png");
   screwdriver.onMousePressed = function() {
-  screwdriver.visible = false;
-  screwdriver.setCollider("rectangle",0,0,0,0);
-  screwdriver1.name = "Screw Driver";
-  tools.push(screwdriver);
-  myBookshelfDoor.appendIntoTools(screwdriver1);
+    screwdriver.visible = false;
+    screwdriver.setCollider("rectangle",0,0,0,0);
+    screwdriver1.name = "Screw Driver";
+    tools.push(screwdriver);
+    myBookshelfDoor.appendIntoTools(screwdriver1);
   };
 
   lowerBookshelfDoor = createSprite(438.5,515);
@@ -265,7 +262,7 @@ function setup() {
     leftKeyPressed();
   };
 
-  rightButton = createSprite(1200,height/2);
+  rightButton = createSprite(1160,height/2);
   rightButton.addAnimation("normal","assets/rightButton.png");
   rightButton.setDefaultCollider();
   rightButton.visible = false;
@@ -273,12 +270,37 @@ function setup() {
     scene = 1;
     rightKeyPressed();
   };
+
+  mirror = createSprite(900,400);
+  mirror.addAnimation("normal","assets/mirror.png");
+  mirror.addAnimation("zoomedIn","assets/people.png");
+  mirror.addAnimation("broke","assets/mirrorb.png");
+  mirror.addAnimation("bleed","assets/peopleb.png");
+  mirror.visible = false;
+
+  cover = createSprite(900,313);
+  cover.addAnimation("normal","assets/mirror1.png");
+  cover.visible = false;
+  cover.onMousePressed = function() {
+    mirrorZoom ++;
+  };
+
+  button = createSprite(270,620);
+  button.addAnimation("normal","assets/button.png");
+  button.visible = false;
+  button.setCollider("rectangle", 0, 0, 0, 0);
+  button.onMousePressed = function() {
+    backKeyPressed = true;
+  };
 }
 
 function draw() {
+  cover.debug = mouseIsPressed;
+  button.debug = mouseIsPressed;
   image(backgroundImage,50,50);
   if(scene === 2){
-
+    image(clock,400,130);
+    movementMirror();
   }
 
   if(scene === 1){
@@ -287,6 +309,7 @@ function draw() {
     image(picture,600,230);
     image(sofa,550,450);
     image(bookPile,363,485);
+    image(hint,440,320);
     movementTable();
     movementBookshelfDoor();
     movementNote();
@@ -437,6 +460,24 @@ function movementNote(){
 }
 
 
+function movementMirror(){
+  if(mirrorZoom > 1){
+    myMirror.backButtonDisplay(900,380,-200,100);
+    cover.setCollider("rectangle",-200,0,730,600);
+    if(mirrorZoom  === 2){
+      myMirror.zoomedIn(cover);
+      rightButton.visible = false
+      mirror.changeAnimation("zoomedIn");
+    }
+    if(mirrorZoom  === 3){
+      mirror.changeAnimation("broke");
+    }
+    if(mirrorZoom  === 4){
+      mirror.changeAnimation("bleed");
+    }
+  }
+}
+
 
 function toolBar(){
   myTable.checkRepeat(tableKey);
@@ -470,8 +511,6 @@ function toolBar(){
 
 function back(){
   if(backKeyPressed === true){
-    note.setDefaultCollider();
-
     camera.position.x = width/2;
     camera.position.y = height/2;
     camera.zoom = 1;
@@ -480,19 +519,29 @@ function back(){
     backKeyPressed = false;
     button.setCollider("rectangle",0,0,0,0);
 
-    bookshelfDoorOpened = 1;
-    bookshelfDoor.setDefaultCollider();
-    bookshelfDoor.changeAnimation("normal");
-    bookshelfDoor.position.x = 438;
+    if(scene === 1){
+      note.setDefaultCollider();
 
-    tableZoom = 1;
-    table.setDefaultCollider();
-    table.changeAnimation("normal");
+      bookshelfDoorOpened = 1;
+      bookshelfDoor.setDefaultCollider();
+      bookshelfDoor.changeAnimation("normal");
+      bookshelfDoor.position.x = 438;
 
-    key.setCollider("rectangle",0,0,0,0);
-    key.visible = false;
+      tableZoom = 1;
+      table.setDefaultCollider();
+      table.changeAnimation("normal");
 
-    backToNormal();
+      key.setCollider("rectangle",0,0,0,0);
+      key.visible = false;
+
+      backToNormal();
+    }
+
+    if(scene === 2){
+      cover.setDefaultCollider();
+      mirrorZoom = 1;
+      mirror.changeAnimation("normal");
+    }
   }
 }
 
@@ -510,10 +559,17 @@ function leftKeyPressed(){
   table.visible = false;
   leftButton.visible = false;
   rightButton.visible = true;
+  mirror.visible = true;
+  cover.visible = true;
+
+  table.setCollider("rectangle",0,0,0,0);
+  cover.setDefaultCollider();
 }
 
 function rightKeyPressed(){
   rightButton.visible = false;
+  mirror.visible = false;
+  cover.visible = false;
   note.visible = true;
   lowerBookshelfDoor.visible = true;
   screwdriver.visible = true;
@@ -526,4 +582,7 @@ function rightKeyPressed(){
   bookshelfDoor.visible = true;
   table.visible = true;
   leftButton.visible = true;
+
+  table.setDefaultCollider();
+  cover.setCollider("rectangle",0,0,0,0);
 }
