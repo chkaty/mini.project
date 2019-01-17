@@ -77,12 +77,6 @@ class Movement{
       }
     }
   }
-
-  inform(x,y){
-    textAlign(CENTER);
-    textSize(5);
-    text("Locked", x, y);
-  }
 }
 
 
@@ -92,20 +86,26 @@ let tools = [];
 let books = [];
 let scene = 1;
 let toolbar = [0,0,0,0,0,0];
-let myTable,myBookshelfDoor,myMirror;
+let myTable,myBookshelfDoor,myMirror,mySwitch;
 let choosed;
-let frame,tableKey,picture,sofa,bookPile,screwdriver1,hint,clock,wood,glass;
-let table,door,key,button,bookshelf,bookshelfDoor,lowerBookshelfDoor,note,screwdriver,leftButton,rightButton,mirror,cover;
+let frame,tableKey,picture,sofa,bookPile,screwdriver1,hint,clock,wood,glass,number,mouse,safeKey1;
+let table,door,key,button,bookshelf,bookshelfDoor,lowerBookshelfDoor,note,screwdriver,leftButton,rightButton,mirror,cover,screw1,screw2,lightSwitch,lightOff,filter1,filter2,eye,bag,safeKey;
 let book1,book2,book3,book4,book5,book6,bookOpened = false;
 let counter1 = 0, counter2 = 0, counter3 = 0, counter4 = 0, counter5 = 0, counter6 = 0;
-let tableZoom = 1, bookshelfDoorOpened = 1, noteOpened = 1, mirrorZoom = 1;
+let tableZoom = 1, bookshelfDoorOpened = 1, noteOpened = 1, mirrorZoom = 1, screwOn = 2, lightSwitchOpened = 1, rightCounter = 0;
 let backKeyPressed;
 let backgroundImage;
+let backgroundMusic,glassBreak;
+let glassBreakPlayed = 0;
+let lightOffed = false, start = false, bagOpened = false;
 
 
 
 function preload() {
+  backgroundMusic = loadSound("assets/back.mp3");
+  glassBreak = loadSound("assets/glass.wav");
   backgroundImage = loadImage("assets/background.png");
+  eye = loadAnimation("assets/eye1.png","assets/eye2.png","assets/eye3.png","assets/eye4.png");
 }
 
 
@@ -115,14 +115,19 @@ function setup() {
   myTable = new Movement(413,-294,351,139);
   myBookshelfDoor = new Movement(240,30,525,250);
   myMirror = new Movement(240,30,525,250);
+  mySwitch = new Movement(-50,10,100,100);
 
   createCanvas(1366, 768);
   hint = loadImage("assets/hint.png");
   wood = loadImage("assets/wood.png");
+  safeKey1 = loadImage("assets/safeKey.png");
+  mouse = loadImage("assets/mouse.png");
+  number = loadImage("assets/number.png");
   clock = loadImage("assets/clock.png");
   tableKey = loadImage("assets/tableKey.png");
   glass = loadImage("assets/glass.png");
   tableKey.choosed = false;
+  glass.choosed = false;
   screwdriver1 = loadImage("assets/screwdriver1.png");
   screwdriver1.choosed = false;
   tableKey.visible = true;
@@ -235,6 +240,7 @@ function setup() {
 
   screwdriver = createSprite(470,555);
   screwdriver.addAnimation("normal","assets/screwdriver.png");
+  screwdriver.setCollider("rectangle",0,0,0,0);
   screwdriver.onMousePressed = function() {
     screwdriver.visible = false;
     screwdriver.setCollider("rectangle",0,0,0,0);
@@ -242,6 +248,7 @@ function setup() {
     tools.push(screwdriver);
     myBookshelfDoor.appendIntoTools(screwdriver1);
   };
+
 
   lowerBookshelfDoor = createSprite(438.5,515);
   lowerBookshelfDoor.addAnimation("normal","assets/bookshelfDoor2.png");
@@ -278,6 +285,7 @@ function setup() {
   mirror.addAnimation("broke","assets/mirrorb.png");
   mirror.addAnimation("bleed","assets/peopleb.png");
   mirror.visible = false;
+  mirror.setCollider("rectangle",0,0,0,0);
   mirror.onMousePressed = function() {
     glass.name = "Glass";
     tools.push(mirror);
@@ -291,6 +299,79 @@ function setup() {
     mirrorZoom ++;
   };
 
+  screw1 = createSprite(690,415);
+  screw1.addAnimation("normal","assets/screw.png");
+  screw1.visible = false;
+  screw1.setCollider("rectangle",0,0,0,0);
+  screw1.onMousePressed = function() {
+    if(screwdriver1.choosed === true){
+      screwOn --;
+      screw1.visible = false;
+
+    }
+  };
+
+  screw2 = createSprite(770,415);
+  screw2.addAnimation("normal","assets/screw.png");
+  screw2.visible = false;
+  screw2.setCollider("rectangle",0,0,0,0);
+  screw2.onMousePressed = function() {
+    if(screwdriver1.choosed === true){
+      screwOn --;
+      screw2.visible = false;
+    }
+  };
+
+  lightSwitch = createSprite(730,380);
+  lightSwitch.addAnimation("normal","assets/switch.png");
+  lightSwitch.addAnimation("open","assets/switcho.png");
+  lightSwitch.visible = false;
+  lightSwitch.setCollider("rectangle",0,0,0,0);
+  lightSwitch.onMousePressed = function() {
+    lightSwitchOpened ++;
+  };
+
+  bag = createSprite(570,500);
+  bag.addAnimation("normal","assets/bag.png");
+  bag.addAnimation("open","assets/bago.png");
+  bag.visible = false;
+  bag.setCollider("rectangle", 0, 0, 0, 0);
+  bag.onMousePressed = function() {
+    if(glass.choosed){
+      bag.changeAnimation("open");
+      choosed = -1;
+      myMirror.deleteFromTools(glass);
+      bagOpened = true;
+    }
+  };
+
+  safeKey =  createSprite(250,570);
+  safeKey.addAnimation("normal","assets/safeKey.png");
+  safeKey.visible = false;
+  safeKey.setCollider("rectangle", 0, 0, 0, 0);
+  safeKey.onMousePressed = function() {
+    backKeyPressed = true;
+    safeKey1.name = "Safe Key";
+    tools.push(safeKey);
+    myMirror.appendIntoTools(safeKey1);
+  };
+
+  lightOff = createSprite(width/2,height/2);
+  lightOff.addAnimation("normal","assets/off.png");
+  lightOff.visible = false;
+
+  filter1 = createSprite(width/2,height/2);
+  filter1.addAnimation("normal","assets/filter1.png");
+  filter1.visible = false;
+
+  filter2 = createSprite(width/2,height/2);
+  filter2.addAnimation("normal","assets/filter2.png");
+  filter2.visible = false;
+
+  eye = loadAnimation("assets/eye1.png","assets/eye2.png","assets/eye3.png","assets/eye4.png");
+  eye.looping = false;
+
+
   button = createSprite(270,620);
   button.addAnimation("normal","assets/button.png");
   button.visible = false;
@@ -298,17 +379,40 @@ function setup() {
   button.onMousePressed = function() {
     backKeyPressed = true;
   };
+
+  backgroundMusic.loop();
+  backgroundMusic.setVolume(0.6);
 }
 
 function draw() {
-  rightButton.debug = mouseIsPressed;
   image(backgroundImage,50,50);
   if(scene === 2){
     image(clock,400,130);
     movementMirror();
+    movementLightSwitch();
+    movementScrew();
+    if(rightCounter <= 0){
+      image(mouse,100,500);
+    }
+    else{
+      if(rightCounter > 0){
+        image(mouse,280,500);
+        if(toolbar.indexOf(safeKey1) < 0){
+          safeKey.visible = true;
+          safeKey.setDefaultCollider();
+        }
+        else{
+          safeKey.visible = false;
+          safeKey.setCollider("rectangle",0,0,0,0);
+        }
+      }
+    }
   }
 
   if(scene === 1){
+    if(start === false){
+      animation(eye, width/2, height/2);
+    }
     image(door,900,230);
     image(bookshelf,350,290);
     image(picture,600,230);
@@ -316,8 +420,8 @@ function draw() {
     image(bookPile,363,485);
     image(hint,440,320);
     movementTable();
-    movementBookshelfDoor();
     movementNote();
+    movementBookshelfDoor();
     checkBook();
   }
   back();
@@ -331,6 +435,7 @@ function draw() {
 
 function movementTable(){
   if(tableZoom > 1){
+    leftButton.setCollider("rectangle",0,0,0,0);
     myTable.backButtonDisplay(270,620,413,-1.4);
     if(tableZoom === 2){
       myTable.zoomedIn(table);
@@ -357,9 +462,10 @@ function movementTable(){
 
 function movementBookshelfDoor(){
   if(bookshelfDoorOpened > 1){
-    myBookshelfDoor.backButtonDisplay(434,425,230,210);
-    table.setCollider("rectangle", 0, 0, 0, 0);
+    table.setCollider("rectangle",0,0,0,0);
     note.setCollider("rectangle",0,0,0,0);
+    leftButton.setCollider("rectangle",0,0,0,0);
+    myBookshelfDoor.backButtonDisplay(434,425,230,210);
     if(bookshelfDoorOpened === 2){
       myBookshelfDoor.zoomedIn(bookshelfDoor);
       bookshelfDoorOpened += 1;
@@ -448,9 +554,11 @@ function movementNote(){
     note.setCollider("rectangle",5,40,270,370);
     bookshelfDoor.setCollider("rectangle",0,0,0,0);
     table.setCollider("rectangle",0,0,0,0);
+    leftButton.setCollider("rectangle",0,0,0,0);
   }
   else{
     note.setDefaultCollider();
+    leftButton.setDefaultCollider();
     if(tableZoom < 2){
       table.setDefaultCollider();
 
@@ -467,37 +575,116 @@ function movementNote(){
 
 function movementMirror(){
   if(mirrorZoom > 1){
+    rightButton.setCollider("rectangle",0,0,0,0);
+    lightSwitch.setCollider("rectangle",0,0,0,0);
+    rightButton.visible = false;
     myMirror.backButtonDisplay(900,380,-210,230);
     cover.setCollider("rectangle",-200,0,730,600);
+    bag.setCollider("rectangle",0,0,0,0);
+    safeKey.setCollider("rectangle",0,0,0,0);
     if(mirrorZoom  === 2){
       myMirror.zoomedIn(cover);
-      rightButton.visible = false;
       mirror.changeAnimation("zoomedIn");
     }
-    if(mirrorZoom  === 3){
-      mirror.changeAnimation("broke");
+    if(toolbar.indexOf(glass) < 0){
+      if(mirrorZoom  === 3){
+        if(glassBreakPlayed === 0){
+          glassBreak.play();
+          glassBreakPlayed ++;
+        }
+        mirror.changeAnimation("broke");
+      }
+      if(mirrorZoom  === 4){
+        mirror.changeAnimation("bleed");
+        mirror.setCollider("rectangle",-320,-200,100,100);
+      }
     }
-    if(mirrorZoom  === 4){
-      mirror.changeAnimation("bleed");
-      mirror.setCollider("rectangle",-300,100,100,100);
+    else{
+      mirror.setCollider("rectangle",0,0,0,0);
     }
   }
 }
 
+function movementLightSwitch(){
+  if(lightSwitchOpened > 1){
+    mySwitch.backButtonDisplay(730,450,-50,180);
+    cover.setCollider("rectangle",0,0,0,0);
+    screw1.setCollider("rectangle",-150,80,30,30);
+    screw2.setCollider("rectangle",50,80,30,30);
+    rightButton.setCollider("rectangle",0,0,0,0);
+    safeKey.setCollider("rectangle",0,0,0,0);
+    bag.setCollider("rectangle",0,0,0,0);
+    if(screw1.visible === false){
+      screw1.setCollider("rectangle",0,0,0,0);
+    }
+    if(screw2.visible === false){
+      screw2.setCollider("rectangle",0,0,0,0);
+    }
+
+    if(lightSwitchOpened  === 2){
+      mySwitch.zoomedIn(lightSwitch);
+      lightSwitchOpened ++;
+    }
+    if(lightSwitchOpened % 2 === 0){
+      if(lightOffed === false){
+        camera.position.x = width/2;
+        camera.position.y = height/2;
+        camera.zoom = 1;
+        filter1.visible = true;
+        filter2.visible = true;
+        setTimeout(function() {
+          mySwitch.zoomedIn(lightSwitch);
+        }, 600);
+        setTimeout(function() {
+          camera.position.x = width/2;
+          camera.position.y = height/2;
+          camera.zoom = 1;
+          filter1.visible = false;
+        }, 500);
+        setTimeout(function() {
+          mySwitch.zoomedIn(lightSwitch);
+          filter2.visible = false;
+          lightOffed = true;
+        }, 600);
+      }
+      mySwitch.changed(lightSwitch);
+      lightOff.visible = true;
+    }
+    else{
+      mySwitch.normal(lightSwitch);
+      lightOff.visible = false;
+    }
+  }
+}
+
+function movementScrew(){
+  if(screwOn >= 1){
+    image(wood,680,400);
+  }
+  else {
+    choosed = -1;
+    mySwitch.deleteFromTools(screwdriver1);
+    if(lightSwitchOpened % 2 === 0){
+      image(number,680,400);
+    }
+  }
+}
 
 function toolBar(){
   myTable.checkRepeat(tableKey);
+  myMirror.checkRepeat(glass);
+  myBookshelfDoor.checkRepeat(screwdriver1);
   for(let i=0; i<toolbar.length; i++){
-    if(toolbar[0] !== 0){
-      image(toolbar[0], 1260, 100);
+    if(toolbar[i] !== 0){
+      image(toolbar[i], 1260, 100+103*i);
     }
-    if(mouseX > 1260 && mouseX < 1335 &&  mouseY > 90+100*i && mouseY < 175+102*i && toolbar[i] !== 0){
+    if(mouseX > 1260 && mouseX < 1335 &&  mouseY > 90+100*i && mouseY < 175+100*i && toolbar[i] !== 0){
       rectMode(CENTER);
       fill(0,0,0,50);
-      rect((1260+1335)/2,(90+100*i+175+100*i)/2-5,70,70,10);
-      if(mouseIsPressed && toolbar[0] !== 0){
-        toolbar[0].choosed = true;
-        choosed = 0;
+      rect((1260+1335)/2,(90+100*i+175+104*i)/2-5,70,70,10);
+      if(mouseIsPressed && toolbar[i] !== 0){
+        toolbar[i].choosed = true;
+        choosed = i;
         if(bookshelfDoorOpened>3){
           bookshelfDoorOpened = 3;
         }
@@ -525,6 +712,9 @@ function back(){
     backKeyPressed = false;
     button.setCollider("rectangle",0,0,0,0);
 
+    rightButton.setDefaultCollider();
+    leftButton.setDefaultCollider();
+
     if(scene === 1){
       note.setDefaultCollider();
 
@@ -550,6 +740,20 @@ function back(){
       cover.setDefaultCollider();
       mirrorZoom = 1;
       mirror.changeAnimation("normal");
+
+      lightSwitch.setDefaultCollider();
+      lightSwitchOpened = 1;
+      lightSwitch.changeAnimation("normal");
+      lightOff.visible = false;
+
+      bag.setDefaultCollider();
+      if(rightCounter > 0 && safeKey.visible === true){
+        safeKey.setDefaultCollider();
+      }
+
+      if(toolbar.indexOf(glass) < 0){
+        glassBreakPlayed = 0;
+      }
     }
   }
 }
@@ -567,19 +771,41 @@ function leftKeyPressed(){
   bookshelfDoor.visible = false;
   table.visible = false;
   leftButton.visible = false;
+
+
   rightButton.visible = true;
   mirror.visible = true;
   cover.visible = true;
+  screw1.visible = true;
+  screw2.visible = true;
+  lightSwitch.visible = true;
+  bag.visible = true;
 
   table.setCollider("rectangle",0,0,0,0);
-  cover.setDefaultCollider();
   mirror.setCollider("rectangle",0,0,0,0);
+  leftButton.setCollider("rectangle",0,0,0,0);
+
+  rightButton.setDefaultCollider();
+  cover.setDefaultCollider();
+  lightSwitch.setDefaultCollider();
+  bag.setDefaultCollider();
 }
 
 function rightKeyPressed(){
+  if(bagOpened){
+    rightCounter ++;
+  }
   rightButton.visible = false;
   mirror.visible = false;
+  lightSwitch.visible = false;
+  screw1.visible = false;
+  screw2.visible = false;
   cover.visible = false;
+  bag.visible = false;
+  safeKey.visible = false;
+
+
+
   note.visible = true;
   lowerBookshelfDoor.visible = true;
   screwdriver.visible = true;
@@ -593,7 +819,15 @@ function rightKeyPressed(){
   table.visible = true;
   leftButton.visible = true;
 
-  table.setDefaultCollider();
+
   cover.setCollider("rectangle",0,0,0,0);
   rightButton.setCollider("rectangle",0,0,0,0);
+  screw1.setCollider("rectangle",0,0,0,0);
+  lightSwitch.setCollider("rectangle",0,0,0,0);
+  bag.setCollider("rectangle",0,0,0,0);
+  safeKey.setCollider("rectangle",0,0,0,0);
+
+  leftButton.setDefaultCollider();
+  table.setDefaultCollider();
+
 }
