@@ -92,18 +92,21 @@ let frame,tableKey,picture,sofa,bookPile,screwdriver1,hint,clock,wood,glass,numb
 let table,door,key,button,bookshelf,bookshelfDoor,lowerBookshelfDoor,note,screwdriver,leftButton,rightButton,mirror,cover,screw1,screw2,lightSwitch,lightOff,filter1,filter2,eye,bag,safeKey;
 let book1,book2,book3,book4,book5,book6,bookOpened = false;
 let counter1 = 0, counter2 = 0, counter3 = 0, counter4 = 0, counter5 = 0, counter6 = 0;
-let tableZoom = 1, bookshelfDoorOpened = 1, noteOpened = 1, mirrorZoom = 1, screwOn = 2, lightSwitchOpened = 1, rightCounter = 0;
+let tableZoom = 1, bookshelfDoorOpened = 1, noteOpened = 1, mirrorZoom = 1, lightSwitchOpened = 1, rightCounter = 0;
 let backKeyPressed;
+let screwOn = 2, leftScrew = true, rightScrew = true;
 let backgroundImage;
-let backgroundMusic,glassBreak;
-let glassBreakPlayed = 0;
-let lightOffed = false, start = false, bagOpened = false;
+let backgroundMusic,glassBreak,horror,locked;
+let glassBreakPlayed = 0, horrorPlayed = 0;
+let lightOffed = false, bagOpened = false;
 
 
 
 function preload() {
   backgroundMusic = loadSound("assets/back.mp3");
   glassBreak = loadSound("assets/glass.wav");
+  locked = loadSound("assets/locked.flac");
+  horror = loadSound("assets/horror.wav");
   backgroundImage = loadImage("assets/background.png");
   eye = loadAnimation("assets/eye1.png","assets/eye2.png","assets/eye3.png","assets/eye4.png");
 }
@@ -307,7 +310,11 @@ function setup() {
     if(screwdriver1.choosed === true){
       screwOn --;
       screw1.visible = false;
-
+      rightScrew = false;
+      if(screwOn <= 0){
+        choosed = -1;
+        mySwitch.deleteFromTools(screwdriver1);
+      }
     }
   };
 
@@ -319,6 +326,11 @@ function setup() {
     if(screwdriver1.choosed === true){
       screwOn --;
       screw2.visible = false;
+      leftScrew = false;
+      if(screwOn <= 0){
+        choosed = -1;
+        mySwitch.deleteFromTools(screwdriver1);
+      }
     }
   };
 
@@ -410,9 +422,7 @@ function draw() {
   }
 
   if(scene === 1){
-    if(start === false){
-      animation(eye, width/2, height/2);
-    }
+    animation(eye, width/2, height/2);
     image(door,900,230);
     image(bookshelf,350,290);
     image(picture,600,230);
@@ -466,6 +476,10 @@ function movementBookshelfDoor(){
     note.setCollider("rectangle",0,0,0,0);
     leftButton.setCollider("rectangle",0,0,0,0);
     myBookshelfDoor.backButtonDisplay(434,425,230,210);
+    if(!tableKey.choosed && bookshelfDoorOpened > 2){
+      textSize(45);
+      text("Locked",434,200);
+    }
     if(bookshelfDoorOpened === 2){
       myBookshelfDoor.zoomedIn(bookshelfDoor);
       bookshelfDoorOpened += 1;
@@ -490,6 +504,13 @@ function movementBookshelfDoor(){
         bookshelfDoor.position.x = 438;
         myBookshelfDoor.normal(bookshelfDoor);
         backToNormal();
+      }
+    }
+    else{
+      if(bookshelfDoor.mouseIsPressed){
+        myBookshelfDoor.normal(bookshelfDoor);
+        textSize(15);
+        text("Locked",410,290);
       }
     }
   }
@@ -586,7 +607,7 @@ function movementMirror(){
       myMirror.zoomedIn(cover);
       mirror.changeAnimation("zoomedIn");
     }
-    if(toolbar.indexOf(glass) < 0){
+    if(tools.indexOf(mirror) < 0){
       if(mirrorZoom  === 3){
         if(glassBreakPlayed === 0){
           glassBreak.play();
@@ -627,6 +648,10 @@ function movementLightSwitch(){
     }
     if(lightSwitchOpened % 2 === 0){
       if(lightOffed === false){
+        if(horrorPlayed === 0){
+          horror.play();
+          horrorPlayed ++;
+        }
         camera.position.x = width/2;
         camera.position.y = height/2;
         camera.zoom = 1;
@@ -662,8 +687,6 @@ function movementScrew(){
     image(wood,680,400);
   }
   else {
-    choosed = -1;
-    mySwitch.deleteFromTools(screwdriver1);
     if(lightSwitchOpened % 2 === 0){
       image(number,680,400);
     }
@@ -776,8 +799,12 @@ function leftKeyPressed(){
   rightButton.visible = true;
   mirror.visible = true;
   cover.visible = true;
-  screw1.visible = true;
-  screw2.visible = true;
+  if(rightScrew){
+    screw1.visible = true;
+  }
+  if(leftScrew){
+    screw2.visible = true;
+  }
   lightSwitch.visible = true;
   bag.visible = true;
 
@@ -821,6 +848,7 @@ function rightKeyPressed(){
 
 
   cover.setCollider("rectangle",0,0,0,0);
+  mirror.setCollider("rectangle",0,0,0,0);
   rightButton.setCollider("rectangle",0,0,0,0);
   screw1.setCollider("rectangle",0,0,0,0);
   lightSwitch.setCollider("rectangle",0,0,0,0);
