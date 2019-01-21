@@ -92,8 +92,8 @@ let books = [];
 let password = "";
 let numbers = [[0,1,2,3,4],[5,6,7,8,9]];
 let myTable,myBookshelfDoor,myMirror,mySwitch,mySafe;
-let frame,tableKey,picture,sofa,bookPile,screwdriver1,hint,clock,wood,glass,number,mouse,safeKey1,start,safe1;
-let table,door,key,button,bookshelf,bookshelfDoor,lowerBookshelfDoor,note,screwdriver,leftButton,rightButton,mirror,cover,screw1,screw2,lightSwitch,lightOff,filter1,filter2,eye,bag,safeKey,safe;
+let frame,tableKey,picture,sofa,bookPile,screwdriver1,hint,clock,wood,glass,number,mouse,safeKey1,start,safe1,magnet1;
+let table,door,key,button,bookshelf,bookshelfDoor,lowerBookshelfDoor,note,screwdriver,leftButton,rightButton,mirror,cover,screw1,screw2,lightSwitch,lightOff,filter1,filter2,eye,bag,safeKey,safe,magnet;
 let book1,book2,book3,book4,book5,book6,bookOpened = false;
 let counter1 = 0, counter2 = 0, counter3 = 0, counter4 = 0, counter5 = 0, counter6 = 0;
 let tableZoom = 1, bookshelfDoorOpened = 1, noteOpened = 1, mirrorZoom = 1, lightSwitchOpened = 1, rightCounter = 0, safeOpened = 1;
@@ -145,6 +145,7 @@ function setup() {
   door = loadImage("assets/door.png");
   bookshelf = loadImage("assets/bookshelf.png");
   safe1 = loadImage("assets/safe.png");
+  magnet1 = loadImage("assets/magenet1.png");
 
   glass = loadImage("assets/glass.png");
   safeKey1 = loadImage("assets/safeKey.png");
@@ -169,6 +170,16 @@ function setup() {
       safeOpen = true;
     }
   };
+
+  magnet = createSprite(413,458);
+  magnet.addAnimation("normal","assets/maganet.png");
+  magnet.onMousePressed = function() {
+    magnet.visible = false;
+    magnet1.name = "Magnet";
+    tools.push(magnet);
+    mySafe.appendIntoTools(magnet1);
+  };
+
 
   table = createSprite(270,550);
   table.addAnimation("normal","assets/table.png");
@@ -398,6 +409,7 @@ function setup() {
 
 
 function draw() {
+  magnet.debug = mouseIsPressed;
   if(scene === 0){
     image(start,0,0);
   }
@@ -590,12 +602,20 @@ function movementSafe(){
     }
     if(safeOpened > 2){
       displayAndCheck();
+      if(password.length === 0 && safeOpen === false){
+        safe.visible = false;
+        fill(0);
+        textSize(7);
+        textAlign(LEFT);
+        text("PASSWORD?",414,414);
+      }
     }
 
     if(safeOpen){
       safe.visible = true;
       safe.changeAnimation("open");
       safe.position.x = 580;
+      magnet.visible = true;
     }
   }
 }
@@ -615,12 +635,6 @@ function mouseClicked(){
 function displayAndCheck(){
   let newPass = "";
   if(password.length < 9 && password.length !== 0 && safePassword === false ){
-    if(newPass === "1739"){
-      safePassword = true;
-    }
-    else{
-      newPass = "";
-    }
     if(password.length === 2){
       newPass = password[1];
     }
@@ -634,18 +648,25 @@ function displayAndCheck(){
       newPass = password[1]+ password[3]+ password[5]+ password[7];
     }
     fill(0);
-    textSize(10);
+    textSize(8);
     textAlign(LEFT);
-    text(newPass,415,415);
+    text(newPass,415,414);
+    if(newPass === "1739"){
+      safePassword = true;
+    }
   }
   else if (safePassword === true ){
     fill(0);
     textSize(9);
     textAlign(LEFT);
-    text("Open",414,415);
+    if(safeOpen){
+      text("",414,415);
+    }
+    else{
+      text("CORRECT",414,415);
+    }
   }
   else{
-    text(" ",414,407);
     password = "";
   }
 }
@@ -901,6 +922,7 @@ function leftKeyPressed(){
   leftButton.visible = false;
   key.visible = false;
   safe.visible = false;
+  magnet.visible = false;
 
 
 
@@ -948,6 +970,7 @@ function leftKeyPressed(){
   bookshelfDoor.setCollider("rectangle",0,0,0,0);
   screwdriver.setCollider("rectangle",0,0,0,0);
   note.setCollider("rectangle",0,0,0,0);
+  magnet.setCollider("rectangle",0,0,0,0);
 
 
   rightButton.setDefaultCollider();
@@ -984,6 +1007,7 @@ function rightKeyPressed(){
     screwdriver.visible = true;
     screwdriver.setDefaultCollider();
   }
+  magnet.visible = false;
   note.visible = true;
   lowerBookshelfDoor.visible = true;
   book1.visible = true;
@@ -1030,4 +1054,5 @@ function rightKeyPressed(){
   book5.setCollider("rectangle",0,0,0,0);
   book6.setCollider("rectangle",0,0,0,0);
   button.setCollider("rectangle",0,0,0,0);
+  magnet.setCollider("rectangle",0,0,0,0);
 }
