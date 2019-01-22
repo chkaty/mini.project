@@ -1,10 +1,11 @@
-// Project Title
-// Your Name
-// Date
+// Escape room
+// Katy Chen
+// 2019/1/21
 //
 // Extra for Experts:
-// - describe what you did to take this project "above and beyond"
+// used p5.play to create the game.
 
+//Class that include the basic functions of sprite
 class Movement{
   constructor(x,y,w,h){
     this.x = x;
@@ -48,6 +49,7 @@ class Movement{
     object.visible = false;
   }
 
+  // append object into toolbar
   appendIntoTools(object){
     for(let i = 0; i<toolbar.length; i++){
       if(toolbar[i] === 0){
@@ -57,23 +59,12 @@ class Movement{
     }
   }
 
+  // delete object form toolbar
   deleteFromTools(object){
     for(let i = 0; i<toolbar.length; i++){
       if(toolbar[i] === object){
         toolbar[i] = 0;
         break;
-      }
-    }
-  }
-
-  checkRepeat(object){
-    let counter = 0;
-    for(let i = 0; i<toolbar.length; i++){
-      if(toolbar[i] === object){
-        counter++;
-      }
-      if(counter > 1){
-        toolbar[i] = 0;
       }
     }
   }
@@ -91,18 +82,22 @@ let choosed;
 let books = [];
 let password = "";
 let numbers = [[0,1,2,3,4],[5,6,7,8,9]];
+
 let myTable,myBookshelfDoor,myMirror,mySwitch,mySafe;
-let frame,tableKey,picture,bookPile,screwdriver1,hint,clock,wood,glass,number,mouse,safeKey1,start,safe1,magnet1,doorKey;
+//Image
+let frame,backgroundImage,tableKey,picture,bookPile,screwdriver1,hint,clock,wood,glass,number,mouse,safeKey1,start,safe1,magnet1,doorKey;
+//Sprite
 let table,door,key,button,bookshelf,bookshelfDoor,lowerBookshelfDoor,note,screwdriver,leftButton,rightButton,mirror,cover,screw1,screw2,lightSwitch,lightOff,filter1,filter2,eye,bag,safeKey,safe,magnet,sofa;
 let book1,book2,book3,book4,book5,book6,bookOpened = false;
 let counter1 = 0, counter2 = 0, counter3 = 0, counter4 = 0, counter5 = 0, counter6 = 0;
+//Property
 let tableZoom = 1, bookshelfDoorOpened = 1, noteOpened = 1, mirrorZoom = 1, lightSwitchOpened = 1, rightCounter = 0, safeOpened = 1;
 let backKeyPressed;
 let screwOn = 2, leftScrew = true, rightScrew = true;
 let lightOffed = false, bagOpened = false, safePassword = false, safeOpen = false;
 let counterLeftButton = 0, counterRightButton = 0;
 
-let backgroundImage;
+//Sound
 let backgroundMusic,glassBreak,horror,end;
 let glassBreakPlayed = 0, horrorPlayed = 0, endPlayed = 0;
 
@@ -125,6 +120,7 @@ function preload() {
 
 
 function setup() {
+  //Setup class
   myTable = new Movement(413,-294,351,139);
   myBookshelfDoor = new Movement(240,30,525,250);
   myMirror = new Movement(240,30,525,250);
@@ -132,7 +128,7 @@ function setup() {
   mySafe = new Movement(240,0,525,250);
 
   createCanvas(1366, 768);
-
+  //Setup image
   hint = loadImage("assets/hint.png");
   start = loadImage("assets/start.png");
   wood = loadImage("assets/wood.png");
@@ -152,6 +148,7 @@ function setup() {
   tableKey = loadImage("assets/tableKey.png");
   screwdriver1 = loadImage("assets/screwdriver1.png");
 
+  //Set element choosed in toolbar to false
   tableKey.choosed = false;
   doorKey.choosed = false;
   glass.choosed = false;
@@ -159,7 +156,7 @@ function setup() {
   safeKey1.choosed = false;
   magnet1.choosed = false;
 
-
+  //Setup sprite
   door = createSprite(1000,410);
   door.addAnimation("normal","assets/door.png");
   door.onMousePressed = function() {
@@ -216,11 +213,12 @@ function setup() {
   key = createSprite(270,510);
   key.addAnimation("normal","assets/key.png");
   key.onMousePressed = function() {
-    tableKey.name = "Bookshelf Key";
-    tools.push(tableKey);
-    myTable.appendIntoTools(tableKey);
+    if(tools.indexOf(tableKey) < 0){
+      tableKey.name = "Bookshelf Key";
+      tools.push(tableKey);
+      myTable.appendIntoTools(tableKey);
+    }
   };
-
 
   book1 = createSprite(375,363);
   book1.addAnimation("normal","assets/book1.png");
@@ -300,9 +298,11 @@ function setup() {
   screwdriver.onMousePressed = function() {
     screwdriver.visible = false;
     screwdriver.setCollider("rectangle",0,0,0,0);
-    screwdriver1.name = "Screw Driver";
-    tools.push(screwdriver);
-    myBookshelfDoor.appendIntoTools(screwdriver1);
+    if(tools.indexOf(screwdriver)<0){
+      screwdriver1.name = "Screw Driver";
+      tools.push(screwdriver);
+      myBookshelfDoor.appendIntoTools(screwdriver1);
+    }
   };
 
   lowerBookshelfDoor = createSprite(438.5,516);
@@ -340,9 +340,11 @@ function setup() {
   mirror.addAnimation("broke","assets/mirrorb.png");
   mirror.addAnimation("bleed","assets/peopleb.png");
   mirror.onMousePressed = function() {
-    glass.name = "Glass";
-    tools.push(mirror);
-    myMirror.appendIntoTools(glass);
+    if(tools.indexOf(mirror)<0){
+      glass.name = "Glass";
+      tools.push(mirror);
+      myMirror.appendIntoTools(glass);
+    }
   };
 
   cover = createSprite(900,313);
@@ -401,10 +403,11 @@ function setup() {
   safeKey =  createSprite(250,570);
   safeKey.addAnimation("normal","assets/safeKey.png");
   safeKey.onMousePressed = function() {
-    backKeyPressed = true;
-    safeKey1.name = "Safe Key";
-    tools.push(safeKey);
-    myMirror.appendIntoTools(safeKey1);
+    if(tools.indexOf(safeKey)<0){
+      safeKey1.name = "Safe Key";
+      tools.push(safeKey);
+      myMirror.appendIntoTools(safeKey1);
+    }
   };
 
   lightOff = createSprite(width/2,height/2);
@@ -426,6 +429,7 @@ function setup() {
     backKeyPressed = true;
   };
 
+  //Start background music
   backgroundMusic.loop();
   backgroundMusic.setVolume(0.6);
 }
@@ -443,6 +447,7 @@ function draw() {
       end.play();
       endPlayed ++;
     }
+    // wait and return to scene 1
     setTimeout(function() {
       scene = 1;
     }, 5000);
@@ -482,12 +487,14 @@ function draw() {
     back();
     drawSprites();
     camera.off();
+    //Make frame and toolbar outside of camera
     image(frame, 0, 0);
     toolBar();
   }
 }
 
 function keyPressed() {
+  //Start game when enter is pressed
   if(scene === 0 && keyCode === ENTER){
     scene = 1;
   }
@@ -495,6 +502,7 @@ function keyPressed() {
 
 function movementTable(){
   if(tableZoom > 1){
+    //Turn off the collision detection for other sprite
     leftButton.setCollider("rectangle",0,0,0,0);
     bookshelfDoor.setCollider("rectangle",0,0,0,0);
     door.setCollider("rectangle",0,0,0,0);
@@ -502,15 +510,18 @@ function movementTable(){
     note.setCollider("rectangle",0,0,0,0);
     safe.setCollider("rectangle",0,0,0,0);
 
+    //Move back button under the table and return to the room if clicked
     myTable.backButtonDisplay(270,620,413,-1.4);
+    //Zoom in when clicked
     if(tableZoom === 2){
       myTable.zoomedIn(table);
       tableZoom += 1;
     }
-
+    //Open
     else if(tableZoom %2 === 0){
       myTable.y = -208.6;
       myTable.changed(table);
+      //Show Key
       if(tools.indexOf(tableKey) < 0){
         myTable.containOther(key,413,-270,32,32);
       }
@@ -518,6 +529,7 @@ function movementTable(){
         myTable.hideObject(key);
       }
     }
+    //Close
     else{
       myTable.y = -294;
       myTable.hideObject(key);
@@ -542,6 +554,7 @@ function movementBookshelfDoor(){
       bookshelfDoorOpened += 1;
     }
 
+    //If toolbar contains bookshelf key and it's choosed
     if(tableKey.choosed === true){
       if(bookshelfDoorOpened %2 === 0){
         myBookshelfDoor.x = 610;
@@ -550,6 +563,7 @@ function movementBookshelfDoor(){
         tableKey.visible = false;
         choosed = -1;
         myTable.deleteFromTools(tableKey);
+
         if(!bookOpened){
           movementBook();
         }
@@ -557,6 +571,7 @@ function movementBookshelfDoor(){
           backToNormal();
         }
       }
+
       else{
         myBookshelfDoor.x = 240;
         bookshelfDoor.position.x = 438;
@@ -564,7 +579,9 @@ function movementBookshelfDoor(){
         backToNormal();
       }
     }
+
     else{
+      //Display text locked
       if(bookshelfDoor.mouseIsPressed){
         myBookshelfDoor.normal(bookshelfDoor);
         fill(0);
@@ -588,6 +605,7 @@ function movementBook(){
 }
 
 function checkBook(){
+  //check if the list books is order form 1-6
   if (counter1 > 0 && counter2 > 0 && counter3 > 0 && counter4 > 0 && counter5 > 0 && counter6 > 0){
     bookOpened = true;
     for(let i = 0; i<books.length; i++){
@@ -597,6 +615,7 @@ function checkBook(){
       }
     }
     backToNormal();
+    //If books are sorted correctly than open lower bookshelf
     if(bookOpened){
       lowerBookshelfDoor.changeAnimation("open");
       screwdriver.setDefaultCollider();
@@ -668,6 +687,7 @@ function movementSafe(){
 }
 
 function mouseClicked(){
+  //Using 2d array to enter the number
   if(safeOpened > 2){
     for(let i = 0; i < numbers.length; i++){
       for(let j = 0; j < numbers[i].length; j++){
@@ -681,6 +701,7 @@ function mouseClicked(){
 
 function displayAndCheck(){
   let newPass = "";
+  //Only show every 2rd number
   if(password.length < 9 && password.length !== 0 && safePassword === false ){
     if(password.length === 2){
       newPass = password[1];
@@ -733,6 +754,7 @@ function movementNote(){
     sofa.setCollider("rectangle",0,0,0,0);
   }
   else{
+    //Set back to orignal
     note.setDefaultCollider();
     leftButton.setDefaultCollider();
     door.setDefaultCollider();
@@ -821,6 +843,7 @@ function movementLightSwitch(){
           horror.play();
           horrorPlayed ++;
         }
+        //Flash back and forth with filter for the first time light switched
         camera.position.x = width/2;
         camera.position.y = height/2;
         camera.zoom = 1;
@@ -852,6 +875,7 @@ function movementLightSwitch(){
 }
 
 function movementScrew(){
+  //Hide the wood when screws are gone
   if(screwOn >= 1){
     image(wood,680,400);
   }
@@ -884,25 +908,23 @@ function movementSafeKey(){
 
 
 function toolBar(){
-  myTable.checkRepeat(tableKey);
-  myMirror.checkRepeat(glass);
-  myBookshelfDoor.checkRepeat(screwdriver1);
+  //Display evry element in toolbar
   for(let i=0; i<toolbar.length; i++){
     if(toolbar[i] !== 0){
       image(toolbar[i], 1260, 100+103*i);
     }
+    //Show a colour difference when the mouse is on top
     if(mouseX > 1260 && mouseX < 1335 &&  mouseY > 90+100*i && mouseY < 175+100*i && toolbar[i] !== 0){
       rectMode(CENTER);
       fill(0,0,0,50);
       rect((1260+1335)/2,(90+100*i+175+104*i)/2-5,70,70,10);
+      //Turn the value to choosed when mouse clicked
       if(mouseIsPressed && toolbar[i] !== 0){
         toolbar[i].choosed = true;
         choosed = i;
-        if(bookshelfDoorOpened>3){
-          bookshelfDoorOpened = 3;
-        }
       }
     }
+    //Show a colour difference when the mouse clicked
     if(choosed > -1){
       fill(0,0,0,10);
       rect((1260+1335)/2,(90+100*choosed+175+104*choosed)/2-5,70,70,10);
@@ -915,7 +937,7 @@ function toolBar(){
 }
 
 
-
+//Setting everything back to original sate
 function back(){
   if(backKeyPressed === true){
     backKeyPressed = false;
@@ -957,6 +979,7 @@ function back(){
   }
 }
 
+//back to original scene 2
 function leftKeyPressed(){
   camera.position.x = width/2;
   camera.position.y = height/2;
@@ -1040,6 +1063,8 @@ function leftKeyPressed(){
   screw2.setCollider("rectangle",0,0,0,0);
 }
 
+
+//back to original scene 1
 function rightKeyPressed(){
   camera.position.x = width/2;
   camera.position.y = height/2;
