@@ -92,8 +92,8 @@ let books = [];
 let password = "";
 let numbers = [[0,1,2,3,4],[5,6,7,8,9]];
 let myTable,myBookshelfDoor,myMirror,mySwitch,mySafe;
-let frame,tableKey,picture,sofa,bookPile,screwdriver1,hint,clock,wood,glass,number,mouse,safeKey1,start,safe1,magnet1;
-let table,door,key,button,bookshelf,bookshelfDoor,lowerBookshelfDoor,note,screwdriver,leftButton,rightButton,mirror,cover,screw1,screw2,lightSwitch,lightOff,filter1,filter2,eye,bag,safeKey,safe,magnet;
+let frame,tableKey,picture,bookPile,screwdriver1,hint,clock,wood,glass,number,mouse,safeKey1,start,safe1,magnet1,doorKey;
+let table,door,key,button,bookshelf,bookshelfDoor,lowerBookshelfDoor,note,screwdriver,leftButton,rightButton,mirror,cover,screw1,screw2,lightSwitch,lightOff,filter1,filter2,eye,bag,safeKey,safe,magnet,sofa;
 let book1,book2,book3,book4,book5,book6,bookOpened = false;
 let counter1 = 0, counter2 = 0, counter3 = 0, counter4 = 0, counter5 = 0, counter6 = 0;
 let tableZoom = 1, bookshelfDoorOpened = 1, noteOpened = 1, mirrorZoom = 1, lightSwitchOpened = 1, rightCounter = 0, safeOpened = 1;
@@ -103,8 +103,8 @@ let lightOffed = false, bagOpened = false, safePassword = false, safeOpen = fals
 let counterLeftButton = 0, counterRightButton = 0;
 
 let backgroundImage;
-let backgroundMusic,glassBreak,horror;
-let glassBreakPlayed = 0, horrorPlayed = 0;
+let backgroundMusic,glassBreak,horror,end;
+let glassBreakPlayed = 0, horrorPlayed = 0, endPlayed = 0;
 
 
 
@@ -114,6 +114,7 @@ function preload() {
   backgroundMusic = loadSound("assets/back.mp3");
   glassBreak = loadSound("assets/glass.wav");
   horror = loadSound("assets/horror.wav");
+  end = loadSound("assets/end.wav");
   backgroundImage = loadImage("assets/background.png");
   eye = loadAnimation("assets/eye1.png","assets/eye2.png","assets/eye3.png","assets/eye4.png");
 }
@@ -139,13 +140,12 @@ function setup() {
   number = loadImage("assets/number.png");
   clock = loadImage("assets/clock.png");
   frame = loadImage("assets/frame.png");
-  sofa = loadImage("assets/sofa.png");
   bookPile = loadImage("assets/bookPile.png");
   picture = loadImage("assets/picture.png");
-  door = loadImage("assets/door.png");
   bookshelf = loadImage("assets/bookshelf.png");
   safe1 = loadImage("assets/safe.png");
-  magnet1 = loadImage("assets/magenet1.png");
+  magnet1 = loadImage("assets/maganet1.png");
+  doorKey = loadImage("assets/doorKey.png");
 
   glass = loadImage("assets/glass.png");
   safeKey1 = loadImage("assets/safeKey.png");
@@ -153,10 +153,34 @@ function setup() {
   screwdriver1 = loadImage("assets/screwdriver1.png");
 
   tableKey.choosed = false;
+  doorKey.choosed = false;
   glass.choosed = false;
   screwdriver1.choosed = false;
   safeKey1.choosed = false;
+  magnet1.choosed = false;
 
+
+  door = createSprite(1000,410);
+  door.addAnimation("normal","assets/door.png");
+  door.onMousePressed = function() {
+    if(doorKey.choosed === true){
+      choosed = -1;
+      mySafe.deleteFromTools(doorKey);
+      scene = 3;
+    }
+  };
+
+  sofa = createSprite(710,530);
+  sofa.addAnimation("normal","assets/sofa.png");
+  sofa.onMousePressed = function(){
+    if(magnet1.choosed === true && tools.indexOf(doorKey) < 0){
+      choosed = -1;
+      mySafe.deleteFromTools(magnet1);
+      doorKey.name = "Door Key";
+      tools.push(doorKey);
+      mySafe.appendIntoTools(doorKey);
+    }
+  };
 
   safe = createSprite(438.5,428);
   safe.addAnimation("normal","assets/safe.png");
@@ -174,10 +198,11 @@ function setup() {
   magnet = createSprite(413,458);
   magnet.addAnimation("normal","assets/maganet.png");
   magnet.onMousePressed = function() {
-    magnet.visible = false;
-    magnet1.name = "Magnet";
-    tools.push(magnet);
-    mySafe.appendIntoTools(magnet1);
+    if(tools.indexOf(magnet)<0){
+      magnet1.name = "Magnet";
+      tools.push(magnet);
+      mySafe.appendIntoTools(magnet1);
+    }
   };
 
 
@@ -290,7 +315,6 @@ function setup() {
   note.onMousePressed = function() {
     noteOpened += 1;
   };
-
 
   leftButton = createSprite(100,height/2);
   leftButton.addAnimation("normal","assets/leftButton.png");
@@ -409,9 +433,19 @@ function setup() {
 
 
 function draw() {
-  magnet.debug = mouseIsPressed;
   if(scene === 0){
     image(start,0,0);
+  }
+  else if (scene === 3){
+    fill(255);
+    rect(0,0,width*2,height*2);
+    if(endPlayed === 0){
+      end.play();
+      endPlayed ++;
+    }
+    setTimeout(function() {
+      scene = 1;
+    }, 5000);
   }
   else{
     image(backgroundImage,50,50);
@@ -432,13 +466,11 @@ function draw() {
         counterRightButton ++;
       }
       animation(eye, width/2, height/2);
-      image(door,900,230);
       image(bookshelf,350,290);
       if(!safeOpen){
         image(safe1,363,393);
       }
       image(picture,600,230);
-      image(sofa,550,450);
       image(bookPile,363,485);
       image(hint,440,320);
       movementTable();
@@ -465,6 +497,8 @@ function movementTable(){
   if(tableZoom > 1){
     leftButton.setCollider("rectangle",0,0,0,0);
     bookshelfDoor.setCollider("rectangle",0,0,0,0);
+    door.setCollider("rectangle",0,0,0,0);
+    sofa.setCollider("rectangle",0,0,0,0);
     note.setCollider("rectangle",0,0,0,0);
     safe.setCollider("rectangle",0,0,0,0);
 
@@ -496,6 +530,8 @@ function movementBookshelfDoor(){
   if(bookshelfDoorOpened > 1){
     table.setCollider("rectangle",0,0,0,0);
     note.setCollider("rectangle",0,0,0,0);
+    door.setCollider("rectangle",0,0,0,0);
+    sofa.setCollider("rectangle",0,0,0,0);
     leftButton.setCollider("rectangle",0,0,0,0);
     safe.setCollider("rectangle",0,0,0,0);
 
@@ -591,6 +627,8 @@ function movementSafe(){
   if(safeOpened > 1){
     bookshelfDoor.setCollider("rectangle",0,0,0,0);
     table.setCollider("rectangle",0,0,0,0);
+    door.setCollider("rectangle",0,0,0,0);
+    sofa.setCollider("rectangle",0,0,0,0);
     leftButton.setCollider("rectangle",0,0,0,0);
     note.setCollider("rectangle",0,0,0,0);
 
@@ -615,7 +653,16 @@ function movementSafe(){
       safe.visible = true;
       safe.changeAnimation("open");
       safe.position.x = 580;
-      magnet.visible = true;
+      if(tools.indexOf(magnet) < 0){
+        magnet.visible = true;
+        setTimeout(function() {
+          magnet.setCollider("rectangle",178,25,280,30);
+        }, 500);
+      }
+      else{
+        magnet.visible = false;
+        magnet.setCollider("rectangle",0,0,0,0);
+      }
     }
   }
 }
@@ -682,16 +729,23 @@ function movementNote(){
     table.setCollider("rectangle",0,0,0,0);
     leftButton.setCollider("rectangle",0,0,0,0);
     safe.setCollider("rectangle",0,0,0,0);
+    door.setCollider("rectangle",0,0,0,0);
+    sofa.setCollider("rectangle",0,0,0,0);
   }
   else{
     note.setDefaultCollider();
     leftButton.setDefaultCollider();
+    door.setDefaultCollider();
+    sofa.setDefaultCollider();
     if(tableZoom < 2){
       table.setDefaultCollider();
 
     }
     if(bookshelfDoorOpened < 2){
       bookshelfDoor.setDefaultCollider();
+    }
+    if(safeOpened < 2){
+      safe.setDefaultCollider();
     }
     note.position.x = 750;
     note.position.y = 500;
@@ -953,9 +1007,13 @@ function leftKeyPressed(){
   filter2.visible = false;
   lightOff.visible = false;
   button.visible = false;
+  door.visible = false;
+  sofa.visible = false;
 
 
   table.setCollider("rectangle",0,0,0,0);
+  door.setCollider("rectangle",0,0,0,0);
+  sofa.setCollider("rectangle",0,0,0,0);
   safe.setCollider("rectangle",0,0,0,0);
   mirror.setCollider("rectangle",0,0,0,0);
   leftButton.setCollider("rectangle",0,0,0,0);
@@ -1007,6 +1065,13 @@ function rightKeyPressed(){
     screwdriver.visible = true;
     screwdriver.setDefaultCollider();
   }
+  safe.position.x = 438.5;
+  if(safeOpen){
+    safe.visible = true;
+  }
+  else{
+    safe.visible = false;
+  }
   magnet.visible = false;
   note.visible = true;
   lowerBookshelfDoor.visible = true;
@@ -1021,13 +1086,9 @@ function rightKeyPressed(){
   leftButton.visible = true;
   key.visible = false;
   button.visible = false;
-  safe.position.x = 438.5;
-  if(safeOpen){
-    safe.visible = true;
-  }
-  else{
-    safe.visible = false;
-  }
+  door.visible = true;
+  sofa.visible = true;
+
 
 
   cover.setCollider("rectangle",0,0,0,0);
@@ -1045,6 +1106,8 @@ function rightKeyPressed(){
   table.setDefaultCollider();
   bookshelfDoor.setDefaultCollider();
   note.setDefaultCollider();
+  door.setDefaultCollider();
+  sofa.setDefaultCollider();
   key.setCollider("rectangle",0,0,0,0);
   book1.setCollider("rectangle",0,0,0,0);
   book2.setCollider("rectangle",0,0,0,0);
